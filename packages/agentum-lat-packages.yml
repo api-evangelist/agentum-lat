@@ -1,0 +1,69 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  Registry metadata read 2026-09-19 from registry.npmjs.org (package documents and the -/v1/search endpoint),
+  pypi.org/pypi/<name>/json, and the GitHub account that both packages name (github.com/orionlabsai). Version
+  and published date are the registry's own dist-tags.latest and time[] values.
+package_count: 2
+official_count: 2
+packages:
+- name: '@agentum/mcp-server'
+  language: javascript
+  runtime: node
+  registry: npm
+  url: https://www.npmjs.com/package/@agentum/mcp-server
+  registry_metadata: https://registry.npmjs.org/@agentum%2Fmcp-server
+  repository: https://github.com/orionlabsai/agentum-mcp-server
+  homepage: https://agentum.lat
+  install: npx -y @agentum/mcp-server
+  bin: agentum-mcp
+  official: true
+  kind: mcp-server-client
+  version: 1.2.4
+  published: '2026-09-12'
+  first_published: '2026-09-08'
+  release_count: 7
+  versions: ['1.0.0', '1.1.0', '1.2.0', '1.2.1', '1.2.2', '1.2.3', '1.2.4']
+  license: MIT
+  mcp_name: io.github.orionlabsai/agentum-mcp-server
+  mcp_registry_manifest: https://raw.githubusercontent.com/orionlabsai/agentum-mcp-server/main/server.json
+  dependencies: ['@modelcontextprotocol/sdk ^1.30.0', '@x402/core ^2.23.0', '@x402/evm ^2.23.0', '@x402/fetch ^2.23.0', 'viem ^2.56.0', 'zod ^3.25.0']
+  configuration:
+    env: AGENTUM_MCP_WALLET_KEY
+    meaning: private key of the CALLER's own Base wallet holding USDC — the package signs x402 payments with it; the provider never issues a credential
+  first_party_evidence: manifest.json author {name AGENTUM, email agentumcomercial@carmozinog.com, url https://agentum.lat} — the same contact email as both OpenAPI info.contact blocks and llms.txt; homepage https://agentum.lat; named in llms.txt ("pacote npm @agentum/mcp-server").
+  note: >-
+    The only first-party client for the API. It is an MCP server, not a general-purpose SDK: it wraps all
+    eleven paid routes (nine on agentum.lat, two on business.agentum.lat — /company is not exposed as a tool)
+    as MCP tools and handles the x402 challenge, payment signature and per-route spend cap internally, so an
+    agent host (Claude Desktop, Claude Code, Cursor) calls the API without any payment code. The SDKs pointer
+    in apis.yml refers to this package on that basis; there is no REST client library in any language.
+- name: '@agentum/x402-spend-guard'
+  language: javascript
+  runtime: node
+  registry: npm
+  url: https://www.npmjs.com/package/@agentum/x402-spend-guard
+  registry_metadata: https://registry.npmjs.org/@agentum%2Fx402-spend-guard
+  repository: https://github.com/orionlabsai/x402-spend-guard
+  install: npm install @agentum/x402-spend-guard
+  bin: x402-kill-switch
+  official: true
+  kind: agent-spend-policy-library
+  version: 1.1.1
+  published: '2026-09-18'
+  first_published: '2026-09-12'
+  release_count: 4
+  versions: ['1.0.0', '1.0.1', '1.1.0', '1.1.1']
+  license: MIT
+  note: >-
+    Not a client for the AGENTUM API. A buyer-side x402 spend-policy layer (per-transaction and daily caps,
+    mandatory allowlists of network/asset/payTo/host, kill switch, circuit breaker, SQLite audit log) published
+    under the same @agentum npm scope and GitHub account; recorded because it is first-party and because it is
+    the provider's answer to the spend-control gap its own MCP server README describes.
+searched:
+- {registry: npm, query: 'https://registry.npmjs.org/-/v1/search?text=agentum', result: '6 packages; 2 under the @agentum scope by this provider (above); "agentum" 2.0.1 (priyankark/agentum-cli) and @lupid/agentum-sdk 0.1.0 are unrelated projects by other authors and are not recorded'}
+- {registry: pypi, query: 'https://pypi.org/pypi/agentum/json', result: 'exists (0.0.1, "Cutting-edge AI agent framework", no homepage) — an unrelated name collision, not this provider'}
+- {registry: github, query: 'https://api.github.com/users/orionlabsai/repos', result: '4 public repositories: agentum-mcp-server, x402-spend-guard, awesome-x402, awesome-agentic-commerce; /orgs/orionlabsai returns 404 (a user account, not an organization)'}
+- {registry: maven-central, result: not searched — no JVM artifact is referenced anywhere on the provider's surfaces}
+- {registry: rubygems/crates/nuget/packagist/pkg.go.dev, result: not referenced by the provider; the documented way in is HTTP + x402 or the npm MCP server}
+cli: none — the agentum-mcp binary is the MCP server entry point, not a command-line client; no cli/ artifact is emitted.

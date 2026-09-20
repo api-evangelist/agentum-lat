@@ -1,0 +1,30 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: >-
+  Searched 2026-09-19: the already-harvested artifacts (well-known/agentum-lat-security.txt, lifecycle/,
+  conformance/; no trust-center artifact exists because none was found), then live probes of the conventional
+  paths on agentum.lat, www.agentum.lat (301 to apex) and business.agentum.lat, then the provider's only
+  documentation surfaces (homepage, llms.txt, both OpenAPI documents, the MCP server README/manifest).
+signals: {}
+probed:
+- {host: agentum.lat, paths: [/terms, /privacy, /security, /security/sbom, /accessibility, /accessibility/vpat, /legal/subprocessors, /legal/dpa, /legal/report-content, /privacy/requests, /transparency, /trust, /ai, /ai/transparency, /docs/data-residency, /changelog, /status], status: 404}
+- {host: business.agentum.lat, paths: [/terms, /privacy, /security, /accessibility, /legal/subprocessors, /legal/dpa, /transparency, /docs, /redoc, /robots.txt], status: 404}
+- {host: www.agentum.lat, status: 301, note: every path redirects to the same path on agentum.lat}
+notes:
+- >-
+  No privacy policy, terms of service, DPA, subprocessor list, accessibility statement, SBOM, transparency
+  report or data-residency page is published on any host — the site is a single landing page plus machine
+  documents. TermsOfService and PrivacyPolicy pointers are therefore NOT emitted in apis.yml.
+- >-
+  security.txt carries Contact and Expires only; there is no Policy line to follow to a disclosure or SBOM
+  page (well-known/agentum-lat-security.txt).
+- >-
+  The contracts carry two data-minimisation statements that are posture, not policy, and are recorded here
+  only as observations: the validar-cpf route/tool "does not look up anyone's personal data" (check-digit
+  arithmetic only), and the business_intelligence tool states partner CPFs are "always masked by the Receita
+  Federal itself". Neither is a published privacy commitment and no signal is set from them.
+- >-
+  The provider names its upstream data sources in the contracts (brasilapi.com.br, receitaws.com.br, Banco
+  Central SGS, TCU, CEIS/CNEP, CNJ, CVM, GLEIF, VIES, Frankfurter/ECB, World Bank). That is source
+  attribution, not a subprocessor list, and is not recorded as one.

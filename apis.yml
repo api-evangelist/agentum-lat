@@ -1,23 +1,198 @@
 aid: agentum-lat
 name: AGENTUM
-description: 'AGENTUM is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  AGENTUM (AGENTUM LTDA, a software company in Sertãozinho, São Paulo, Brazil, registered September 2026) is a
+  "payment agent" data provider: eleven HTTP endpoints sold per call over the x402 protocol — USDC on Base
+  mainnet (eip155:8453) — with no account, no API key and no subscription; an agent pays inside the request and
+  receives the result in the same round trip. Nine routes on agentum.lat cover Brazilian and global company and
+  market data (CNPJ registration status, CEP address lookup, CPF check-digit validation, Banco Central
+  Selic/CDI/commercial-dollar rates, ECB FX rates, World Bank indicators, EU VIES VAT validation, GLEIF LEI
+  lookup and an AI-summarised business-intelligence report on a CNPJ), and three on business.agentum.lat
+  (AGENTUM Business) add counterparty compliance checks against TCU, CEIS/CNEP, CNJ and CVM plus a consolidated
+  preflight verdict. The same routes ship as eleven tools in the @agentum/mcp-server npm package (stdio, the
+  caller's own wallet pays), and AGENTUM Business is also an A2A 1.0 JSON-RPC agent with a card at
+  business.agentum.lat/.well-known/agent-card.json. Partial OpenAPI 3.1 contracts, an llms.txt and an RFC 9116
+  security.txt are published; every paid route answers a genuine x402 v2 challenge with Bazaar discovery
+  metadata and IETF RateLimit headers.
 url: https://raw.githubusercontent.com/api-evangelist/agentum-lat/refs/heads/main/apis.yml
+image: https://agentum.lat/agentum-logo.png
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
 - Company
-apis: []
+- Business Intelligence
+- KYB
+- Company Data
+- Compliance
+- Brazil
+- x402
+- Agentic Commerce
+- Exchange Rates
+- Address Verification
+- Economic Data
+- MCP
+- A2A
+- Agents
+apis:
+- aid: agentum-lat:apis-brasil
+  name: AGENTUM APIs Brasil
+  description: >-
+    The agentum.lat host: nine pay-per-call routes — GET /verificar-cnpj (CNPJ registration status, Simples
+    Nacional, address; $0.02), GET /taxas-brasil (Selic, CDI, commercial dollar from Banco Central SGS; $0.01),
+    GET /verificar-cep (address from a CEP; $0.01), GET /validar-cpf (CPF check digit only, no personal-data
+    lookup; $0.01), POST /business-intelligence (consolidated CNPJ report with partners and an AI summary;
+    $0.05), GET /fx-rates (ECB rates via Frankfurter; $0.01), GET /economic-data (World Bank indicators; $0.01),
+    GET /vat-validate (EU VIES; $0.01) and GET /company-enrich (GLEIF LEI lookup; $0.01). Every route answers
+    HTTP 402 with an x402 v2 PaymentRequirements challenge (exact scheme, USDC on eip155:8453, Bazaar discovery
+    extension) until paid. The published OpenAPI 3.1.0 at /openapi.json is PARTIAL by the provider's own
+    statement in llms.txt ("Schema parcial (algumas rotas)"): it describes four of the nine routes
+    (businessIntelligence, verificarCnpj, verificarCep, taxasBrasil); the other five are documented on the
+    homepage, in llms.txt and in the MCP server source, and each returned a live 402 challenge when probed.
+  humanURL: https://agentum.lat/
+  baseURL: https://agentum.lat
+  tags:
+  - Brazil
+  - KYB
+  - Company Data
+  - Exchange Rates
+  - Address Verification
+  - x402
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-apis-brasil-openapi.json
+  - type: OpenAPI
+    name: AGENTUM — APIs Brasil OpenAPI (provider-hosted)
+    url: https://agentum.lat/openapi.json
+  - type: Documentation
+    url: https://agentum.lat/
+  - type: APIReference
+    url: https://agentum.lat/openapi.json
+  - type: Overlay
+    url: overlays/agentum-lat-apis-brasil-overlay.yaml
+- aid: agentum-lat:business
+  name: AGENTUM Business API
+  description: >-
+    The business.agentum.lat host ("AGENTUM Business", a separately deployed service with its own payout
+    wallet): GET /preflight?q= (counterparty verdict for a CNPJ, a 20-character LEI or a company name —
+    band clear/flagged/insufficient_data, confidence, flags and per-source components; $0.15),
+    GET /company-intelligence?cnpj= (CNPJ registration crossed with public-integrity sources TCU, CEIS/CNEP,
+    CNJ and CVM, facts only, no score; $0.02) and GET /company?cnpj= (basic registration without the integrity
+    check; $0.02). The OpenAPI 3.1.0 at /openapi.json covers all three operations (preflight,
+    companyIntelligence, company) with 200/400/402 and 404 or 502 responses; the host root returns a JSON
+    service index linking the agent card, /health and the OpenAPI, and every paid route answers an x402 v2
+    challenge until paid.
+  humanURL: https://agentum.lat/
+  baseURL: https://business.agentum.lat
+  tags:
+  - KYB
+  - Compliance
+  - Counterparty Verification
+  - Brazil
+  - x402
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-business-openapi.json
+  - type: OpenAPI
+    name: AGENTUM Business OpenAPI (provider-hosted)
+    url: https://business.agentum.lat/openapi.json
+  - type: APIReference
+    url: https://business.agentum.lat/openapi.json
+  - type: Overlay
+    url: overlays/agentum-lat-business-overlay.yaml
+- aid: agentum-lat:business-a2a-agent
+  name: AGENTUM Business A2A Agent
+  description: >-
+    Agent2Agent (A2A) protocol surface of AGENTUM Business: an agent card at
+    https://business.agentum.lat/.well-known/agent-card.json (A2A 1.0 shape — supportedInterfaces with
+    protocolBinding JSONRPC and protocolVersion "1.0", version 0.1.0, provider AGENTUM) advertising two skills:
+    company_intelligence (structured CNPJ intelligence from brasilapi.com.br with a receitaws.com.br fallback)
+    and repo_intelligence (question answering over a public GitHub repository through the external DeepWiki
+    MCP server, stated as free "in this lab round"). The JSON-RPC endpoint is the host root,
+    https://business.agentum.lat/; it enforces the protocol version (an unversioned request is refused with
+    JSON-RPC error -32009 "Supported versions: 1.0"). Streaming is declared supported, push notifications and
+    an extended card are not, and securitySchemes is empty.
+  humanURL: https://business.agentum.lat/.well-known/agent-card.json
+  baseURL: https://business.agentum.lat/
+  tags:
+  - A2A
+  - Agents
+  - KYB
+  - Brazil
+  properties:
+  - type: AgentCard
+    url: a2a/agentum-lat-a2a.yml
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted)
+    url: https://business.agentum.lat/.well-known/agent-card.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/agentum-lat-agentic-access.yml
+- type: VulnerabilityDisclosure
+  url: security/agentum-lat-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/agentum-lat-domain-security.yml
 - type: Website
   url: https://agentum.lat/
+- type: Documentation
+  url: https://agentum.lat/
+- type: Pricing
+  url: https://agentum.lat/
+- type: GitHubOrganization
+  url: https://github.com/orionlabsai
+- type: LLMsTxt
+  url: llms/agentum-lat-llms.txt
+- type: LLMsTxt
+  name: llms.txt (provider-hosted)
+  url: https://agentum.lat/llms.txt
+- type: WellKnown
+  url: well-known/agentum-lat-well-known.yml
+- type: SecurityTxt
+  url: well-known/agentum-lat-security.txt
+- type: AgentCard
+  url: a2a/agentum-lat-a2a.yml
+- type: MCPServer
+  url: mcp/agentum-lat-mcp.yml
+- type: MCPServer
+  name: MCP server source (GitHub)
+  url: https://github.com/orionlabsai/agentum-mcp-server
+- type: ToolCrosswalk
+  url: mcp/agentum-lat-tool-crosswalk.yml
+- type: Packages
+  url: packages/agentum-lat-packages.yml
+- type: SDKs
+  url: packages/agentum-lat-packages.yml
+- type: Authentication
+  url: authentication/agentum-lat-authentication.yml
+- type: Conventions
+  url: conventions/agentum-lat-conventions.yml
+- type: ErrorCatalog
+  url: errors/agentum-lat-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/agentum-lat-lifecycle.yml
+- type: RateLimits
+  url: rate-limits/agentum-lat-rate-limits.yml
+- type: Plans
+  url: plans/agentum-lat-plans-pricing.yml
+- type: Conformance
+  url: conformance/agentum-lat-conformance.yml
+- type: DataModel
+  url: data-model/agentum-lat-data-model.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Security
+  url: security/agentum-lat-vulnerability-disclosure.yml
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 30
+  pass: local-v3

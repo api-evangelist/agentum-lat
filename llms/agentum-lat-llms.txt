@@ -1,0 +1,28 @@
+# AGENTUM
+
+> Dados brasileiros e globais em tempo real, pagos por chamada em USDC via x402 (Base mainnet). Sem chave de API, sem cadastro, sem assinatura mensal.
+
+AGENTUM expõe 9 endpoints HTTP em agentum.lat + 1 endpoint em business.agentum.lat, todos respondendo 402 Payment Required (protocolo x402) e entregando dado real assim que o pagamento é liquidado on-chain. Todos aceitam GET (exceto onde indicado), preço fixo em USDC, rede Base (eip155:8453).
+
+## Rotas
+
+- GET /verificar-cnpj?cnpj= — $0.02 — Situação cadastral, Simples Nacional, endereço de empresa brasileira
+- GET /taxas-brasil — $0.01 — Selic, CDI, dólar comercial (Banco Central do Brasil)
+- GET /verificar-cep?cep= — $0.01 — Endereço completo a partir de um CEP
+- GET /validar-cpf?cpf= — $0.01 — Dígito verificador de CPF (sem consultar dado pessoal)
+- POST /business-intelligence {"cnpj":""} — $0.05 — CNPJ completo + sócios + resumo gerado por IA
+- GET /fx-rates?base=&symbols= — $0.01 — Câmbio oficial (Banco Central Europeu, via Frankfurter), qualquer par de moedas
+- GET /economic-data?country=&metric= — $0.01 — PIB, inflação, desemprego, população (Banco Mundial), qualquer país
+- GET /vat-validate?country=&vat= — $0.01 — Validação de VAT europeu em tempo real (VIES, oficial da UE)
+- GET /company-enrich?name= ou lei= — $0.01 — Identificação global de empresa via LEI (GLEIF)
+- GET https://business.agentum.lat/company-intelligence?cnpj= — $0.02 — CNPJ + compliance (TCU, CNJ, CEIS, CNEP, CVM), só fatos, sem score
+
+## MCP
+
+Todas as 10 rotas também estão disponíveis como ferramentas MCP (Model Context Protocol) no pacote npm `@agentum/mcp-server` — instale com `npx @agentum/mcp-server`, configure sua própria carteira Base com USDC, e use direto no Claude Desktop, Claude Code ou qualquer client MCP.
+
+## Segurança e transparência
+
+- Discovery: extensão Bazaar do x402 habilitada em todas as rotas pagas.
+- Schema parcial (algumas rotas): /openapi.json
+- Contato: agentumcomercial@carmozinog.com

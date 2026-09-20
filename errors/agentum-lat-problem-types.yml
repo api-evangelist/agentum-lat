@@ -1,0 +1,100 @@
+generated: '2026-09-19'
+method: derived
+format: mixed
+source:
+- openapi/agentum-lat-apis-brasil-openapi.json
+- openapi/agentum-lat-business-openapi.json
+observed_on:
+- https://agentum.lat/
+- https://business.agentum.lat/
+summary: >-
+  Both contracts declare a 402 on every operation; the Business contract also declares 400 (invalid query /
+  CNPJ), 404 (preflight: no company for that LEI/name) and 502 (sources unavailable), with descriptions but no
+  response schema. Every entry below marked observed was returned live on 2026-09-19 without any payment being
+  made. Two envelopes are in use and neither is RFC 9457: agentum.lat answers its 402 with an EMPTY JSON object
+  ({}) and puts the whole PaymentRequirements document in the PAYMENT-REQUIRED header; business.agentum.lat
+  answers with {"error":"<CODE>","message":"<text>"} plus the same header. Unknown paths on both hosts return
+  Express's HTML "Cannot GET <path>". The payment gate answers FIRST on both hosts: a malformed CNPJ (cnpj=123) on either host and an empty or one-character preflight q both returned 402, so the contract's 400 sits behind the gate, was not observed, and a malformed query is challenged exactly like a valid one.
+envelope:
+  business_agentum_lat: '{"error": string (SCREAMING_SNAKE code), "message": string}'
+  agentum_lat: '{} on 402; {"error": string (Portuguese sentence)} on 429'
+  unknown_route: Express HTML "Cannot GET <path>" (text/html), both hosts
+problems:
+- status: 402
+  code: PAYMENT_REQUIRED
+  title: Payment required (x402 v2)
+  media_type: application/json; charset=utf-8
+  headers:
+  - 'PAYMENT-REQUIRED: <base64 JSON PaymentRequirements — x402Version 2, resource {url, description, mimeType}, accepts[{scheme exact, network eip155:8453, amount (atomic USDC), asset, payTo, maxTimeoutSeconds 300, extra {name "USD Coin", version "2"}}], extensions.bazaar {info, schema}>'
+  - 'RateLimit-Policy / RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset'
+  body_agentum_lat: '{}'
+  body_business: '{"error":"PAYMENT_REQUIRED","message":"Payment required"}'
+  when: Any request to a paid route without a valid x402 payment. Observed on GET /taxas-brasil, /verificar-cnpj, /verificar-cep, /validar-cpf, /fx-rates, /economic-data, /vat-validate, /company-enrich, POST /business-intelligence (agentum.lat) and GET /company, /company-intelligence, /preflight (business.agentum.lat).
+  remediation: Decode PAYMENT-REQUIRED, settle accepts[0] (exact scheme, USDC on Base) within maxTimeoutSeconds and retry with the x402 payment header; the provider's @agentum/mcp-server does this with @x402/fetch. Each 402 counts against the rate limit.
+  declared_in_contract: true
+  observed: true
+  source_operations:
+  - openapi/agentum-lat-apis-brasil-openapi.json#businessIntelligence
+  - openapi/agentum-lat-apis-brasil-openapi.json#verificarCnpj
+  - openapi/agentum-lat-apis-brasil-openapi.json#verificarCep
+  - openapi/agentum-lat-apis-brasil-openapi.json#taxasBrasil
+  - openapi/agentum-lat-business-openapi.json#preflight
+  - openapi/agentum-lat-business-openapi.json#companyIntelligence
+  - openapi/agentum-lat-business-openapi.json#company
+- status: 400
+  title: Invalid input (CNPJ / query)
+  contract_descriptions:
+  - 'preflight: "Query inválida (não é CNPJ, LEI nem nome utilizável)"'
+  - 'companyIntelligence, company: "CNPJ inválido"'
+  media_type: application/json; charset=utf-8
+  when: Malformed identifier — fewer than 14 CNPJ digits, empty or unusable preflight q. Sits BEHIND the payment gate — probes with cnpj=123 and q= returned 402, not 400, so this response is declared but was not observed anonymously and a malformed query may still be charged.
+  declared_in_contract: true
+  observed: false
+  source_operations:
+  - openapi/agentum-lat-business-openapi.json#preflight
+  - openapi/agentum-lat-business-openapi.json#companyIntelligence
+  - openapi/agentum-lat-business-openapi.json#company
+  note: agentum.lat/verificar-cnpj?cnpj=123 likewise returned 402 (its contract declares no 400 at all).
+- status: 404
+  title: No company found for that LEI / name
+  contract_description: 'preflight: "Nenhuma empresa encontrada pra esse LEI/nome"'
+  when: preflight resolved the query type as lei or name and the GLEIF lookup returned nothing. Only reachable after payment; not observed.
+  declared_in_contract: true
+  observed: false
+  source_operations:
+  - openapi/agentum-lat-business-openapi.json#preflight
+- status: 404
+  title: Unknown route
+  media_type: text/html; charset=utf-8
+  body: '<pre>Cannot GET /<path></pre>'
+  when: Any undeclared path on either host (observed on /docs, /mcp, /graphql, every unserved /.well-known/*, and a negative-control path). No JSON envelope.
+  declared_in_contract: false
+  observed: true
+- status: 429
+  title: Too many requests
+  media_type: application/json; charset=utf-8
+  body: '{"error":"muitas tentativas — espera um pouco"}'
+  headers: ['Retry-After: 60', 'RateLimit-Remaining: 0', 'RateLimit-Reset: 60']
+  when: More than 10 requests in 60 s to agentum.lat (120 on business.agentum.lat); unpaid 402 challenges count. Observed on the eleventh GET /taxas-brasil.
+  declared_in_contract: false
+  observed: true
+- status: 500
+  title: A2A protocol version not supported (JSON-RPC -32009)
+  media_type: application/json; charset=utf-8
+  body: '{"jsonrpc":"2.0","id":1,"error":{"code":-32009,"message":"The requested A2A protocol version ''0.3'' is not supported. Supported versions: 1.0","data":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"VERSION_NOT_SUPPORTED","domain":"a2a-protocol.org"}]}}'
+  when: >-
+    POST https://business.agentum.lat/ (the A2A JSON-RPC root) without an A2A-Version: 1.0 header. With the header, an unknown method returns HTTP 200 with JSON-RPC -32601 "Invalid method.".
+  declared_in_contract: false
+  observed: true
+- status: 502
+  title: Upstream sources unavailable
+  contract_description: '"Fontes indisponíveis no momento da consulta"'
+  when: brasilapi.com.br / receitaws.com.br or an integrity registry (TCU, CEIS/CNEP, CNJ, CVM) did not answer. Only reachable after payment; not observed.
+  declared_in_contract: true
+  observed: false
+  source_operations:
+  - openapi/agentum-lat-business-openapi.json#companyIntelligence
+  - openapi/agentum-lat-business-openapi.json#company
+json_rpc_errors_observed:
+- {code: -32009, message: "The requested A2A protocol version '0.3' is not supported. Supported versions: 1.0", http_status: 500, reason: VERSION_NOT_SUPPORTED}
+- {code: -32601, message: Invalid method., http_status: 200, note: 'returned for 0.3-style method names (tasks/get) when A2A-Version: 1.0 is sent'}

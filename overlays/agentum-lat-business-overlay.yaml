@@ -1,0 +1,71 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for AGENTUM Business
+  version: 1.0.0
+extends: ../openapi/agentum-lat-business-openapi.json
+x-generated: '2026-09-19'
+x-method: generated
+x-source: >-
+  Generated from openapi/agentum-lat-business-openapi.json plus what was observed on the live host on
+  2026-09-19 (402 challenges with PaymentRequirements, rate-limit headers, a 402 on a malformed CNPJ (the payment gate precedes validation), the JSON
+  service index at /, /health, the A2A agent card and JSON-RPC errors). Nothing is proposed that the host does
+  not do. The original file is never mutated.
+actions:
+- target: $.info
+  description: Link the host's other surfaces.
+  update:
+    x-agent-card: https://business.agentum.lat/.well-known/agent-card.json
+    x-a2a-endpoint: https://business.agentum.lat/ (JSON-RPC; requires an A2A-Version 1.0 header)
+    x-service-index: https://business.agentum.lat/
+    x-health: https://business.agentum.lat/health
+    x-sibling-contract: https://agentum.lat/openapi.json
+    x-mcp-server: '@agentum/mcp-server tools company_intelligence_br and preflight (no tool for /company)'
+- target: $.servers[0]
+  update:
+    description: Production. A separately deployed service from agentum.lat with its own payout wallet (0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F).
+- target: $.paths.*.*.responses.402
+  description: Document the observed 402 envelope.
+  update:
+    headers:
+      PAYMENT-REQUIRED:
+        description: base64-encoded JSON x402 v2 PaymentRequirements {x402Version 2, accepts [{scheme exact, network eip155:8453, amount (atomic USDC), asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913, payTo 0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F, maxTimeoutSeconds 300}], extensions {bazaar {info, schema}}}
+        schema: {type: string, contentEncoding: base64}
+      RateLimit-Policy: {schema: {type: string}, example: 120;w=60}
+      RateLimit-Limit: {schema: {type: integer}, example: 120}
+      RateLimit-Remaining: {schema: {type: integer}}
+      RateLimit-Reset: {schema: {type: integer}}
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error: {type: string, example: PAYMENT_REQUIRED}
+            message: {type: string, example: Payment required}
+- target: $.paths.*.*.responses.400
+  description: The contract declares 400 without a body; it was NOT observable anonymously because the x402 gate answers first (cnpj=123 and q= returned 402 on 2026-09-19).
+  update:
+    x-observed: false
+    x-note: sits behind the payment gate; body shape unknown
+- target: $.paths
+  description: Two free operations the host serves that the contract omits — observed 2026-09-19.
+  update:
+    /health:
+      get:
+        operationId: health
+        summary: Service health (free, unauthenticated)
+        responses:
+          '200':
+            description: Health object
+            content:
+              application/json:
+                example: {status: ok, service: agentum-business, version: 0.1.0}
+    /:
+      get:
+        operationId: serviceIndex
+        summary: JSON service index — links the agent card, health, OpenAPI and the three paid endpoints with prices (free)
+        responses:
+          '200':
+            description: Service index
+- target: $.paths.*.*
+  update:
+    x-agentic-access-note: read-only query, paid per call, no reversal (see agentic-access/ and conventions/ in this repo)

@@ -1,0 +1,61 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for AGENTUM — APIs Brasil
+  version: 1.0.0
+extends: ../openapi/agentum-lat-apis-brasil-openapi.json
+x-generated: '2026-09-19'
+x-method: generated
+x-source: >-
+  Generated from openapi/agentum-lat-apis-brasil-openapi.json plus what was observed on the live host on
+  2026-09-19 (402 challenges, rate-limit headers, a 429, and a 402 — not a 400 — on a malformed CNPJ, because the payment gate precedes validation) and the provider's own
+  llms.txt. Every value below was observed or read from the provider's documents; nothing is proposed that the
+  host does not do. The original file is never mutated.
+actions:
+- target: $.info
+  description: Link the provider's other machine-readable surfaces and state the contract's own coverage.
+  update:
+    x-llms-txt: https://agentum.lat/llms.txt
+    x-security-txt: https://agentum.lat/.well-known/security.txt
+    x-mcp-server: '@agentum/mcp-server (npm, stdio) — https://github.com/orionlabsai/agentum-mcp-server'
+    x-sibling-contract: https://business.agentum.lat/openapi.json
+    x-coverage-note: >-
+      Partial by the provider's own statement (llms.txt: "Schema parcial (algumas rotas)"). Five further
+      routes on this host are documented on the homepage and in llms.txt and each returned a live x402 402
+      challenge on 2026-09-19 but are not in this document: GET /validar-cpf?cpf= ($0.01), GET
+      /fx-rates?base=&symbols= ($0.01), GET /economic-data?country=&metric= ($0.01), GET
+      /vat-validate?country=&vat= ($0.01), GET /company-enrich?name=|lei= ($0.01). Their input shapes are
+      published in the Bazaar schema of each challenge and in the MCP tool definitions.
+- target: $.servers[0]
+  description: Name the host and note it doubles as the website.
+  update:
+    description: Production. The same host serves the human landing page at / and the paid routes; there is no separate api. host.
+- target: $.paths.*.*.responses.402
+  description: Document the observed 402 envelope — header-borne PaymentRequirements and an empty JSON body.
+  update:
+    headers:
+      PAYMENT-REQUIRED:
+        description: base64-encoded JSON x402 v2 PaymentRequirements {x402Version 2, error, resource {url, description, mimeType}, accepts [{scheme exact, network eip155:8453, amount (atomic USDC), asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913, payTo 0xB4f9061e3a6A5533431336506b34e1035029599f, maxTimeoutSeconds 300, extra {name "USD Coin", version "2"}}], extensions {bazaar {info, schema}}}
+        schema: {type: string, contentEncoding: base64}
+      RateLimit-Policy: {schema: {type: string}, example: 10;w=60}
+      RateLimit-Limit: {schema: {type: integer}, example: 10}
+      RateLimit-Remaining: {schema: {type: integer}}
+      RateLimit-Reset: {schema: {type: integer}, example: 60}
+    content:
+      application/json:
+        schema: {type: object}
+        example: {}
+- target: $.paths.*.*.responses
+  description: Add the response observed on the host that the contract does not declare.
+  update:
+    '429':
+      description: Too many requests — more than 10 in 60 s from one client (unpaid 402 challenges count). Observed 2026-09-19.
+      headers:
+        Retry-After: {schema: {type: integer}, example: 60}
+        RateLimit-Remaining: {schema: {type: integer}, example: 0}
+      content:
+        application/json:
+          example: {error: muitas tentativas — espera um pouco}
+- target: $.paths.*.*
+  description: Every operation is a paid read; carry the agentic-access classification alongside the provider's x-payment-info.
+  update:
+    x-agentic-access-note: read-only query, paid per call, no reversal (see agentic-access/ and conventions/ in this repo)

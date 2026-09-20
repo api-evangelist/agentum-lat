@@ -1,0 +1,44 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  Searched 2026-09-19: agentum.lat homepage, llms.txt, both OpenAPI documents, the business.agentum.lat
+  service index and /health, the @agentum/mcp-server README, manifest.json and server.json, and the
+  orionlabsai GitHub repositories (no releases, no tags). Probed /status, /changelog, /docs on both hosts (404).
+versioning:
+  scheme: none-in-uri
+  current:
+    apis_brasil: 'OpenAPI info.version 1.0.0 (https://agentum.lat/openapi.json)'
+    business: 'OpenAPI info.version 0.1.0; /health reports version 0.1.0; agent card version 0.1.0'
+    mcp_server: '@agentum/mcp-server 1.2.4 (npm, 2026-09-12); the MCP server object self-reports 1.0.0'
+  docs: null
+  note: >-
+    No version segment in any path, no version header, no versioning policy published. The A2A endpoint does
+    version-negotiate: an unversioned JSON-RPC request is refused with -32009 "The requested A2A protocol
+    version '0.3' is not supported. Supported versions: 1.0".
+deprecation:
+  policy_url: null
+  sunset_header: false
+  deprecation_header: false
+  note: No deprecation policy, Sunset or Deprecation header support is published or was observed.
+sla:
+  url: null
+  uptime_target: null
+  note: No SLA is published. Business-intelligence routes describe upstream dependence (brasilapi.com.br with a receitaws.com.br fallback; TCU, CEIS/CNEP, CNJ, CVM; GLEIF; VIES; Frankfurter; World Bank) and declare 502 for upstream failure.
+status_page: null
+health_endpoint:
+  url: https://business.agentum.lat/health
+  observed: '{"status":"ok","service":"agentum-business","version":"0.1.0"}'
+  note: Free, unauthenticated, JSON. agentum.lat publishes no equivalent (/health 404).
+changelog: null
+maturity:
+  stage: early / "built in public" — the homepage footer reads "construído em público, um agente de cada vez"; the company was registered 2026-09-03 and the first npm release is 2026-09-08. The repo_intelligence A2A skill is labelled a lab round.
+deprecated_operations: []
+release_history:
+  mcp_server_npm:
+  - {version: 1.0.0, published: '2026-09-08'}
+  - {version: 1.2.4, published: '2026-09-12'}
+  note: Seven npm versions in five days (1.0.0, 1.1.0, 1.2.0, 1.2.1, 1.2.2, 1.2.3, 1.2.4); no GitHub releases or tags accompany them and no changelog text is published, so a changelog/ artifact is not emitted.
+pointers_not_emitted:
+- StatusPage (none published)
+- Deprecation (no policy published)
+- ChangeLog (no dated changelog published)

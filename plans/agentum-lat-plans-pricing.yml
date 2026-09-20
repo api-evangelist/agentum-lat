@@ -1,0 +1,102 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentum.lat/
+additional_sources:
+- https://agentum.lat/llms.txt
+- https://agentum.lat/openapi.json (x-payment-info per operation)
+- https://business.agentum.lat/openapi.json (x-payment-info per operation)
+- https://business.agentum.lat/ (service index with prices)
+- live 402 challenges on 2026-09-19 (accepts[].amount in atomic USDC units, confirming each published price)
+checked: '2026-09-19'
+summary: >-
+  AGENTUM publishes no subscription, tier, free quota or enterprise plan: the only commercial model is a fixed
+  USD price per call, paid in USDC on Base mainnet (eip155:8453) through the x402 protocol (v2, "exact"
+  scheme) inside the request itself. There is no sign-up, no API key and no invoice — the price is quoted in
+  the 402 challenge and settled on-chain before the response is released. Twelve routes across two hosts,
+  priced from $0.01 to $0.15 per call. Every published price was confirmed against the live challenge
+  (USDC has six decimals, so 10000 atomic units = $0.01). The repo_intelligence A2A skill is stated free "in
+  this lab round" and is the only unpriced surface.
+plan_count: 1
+prices_published: true
+currency: USD
+billing_period: per-call
+public_signup_pricing: true
+payment:
+  protocol: x402 v2
+  scheme: exact
+  network: eip155:8453 (Base mainnet)
+  asset: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+  settlement: on-chain, inside the request; maxTimeoutSeconds 300 per challenge
+  gas: paid by the facilitator per the MCP package README ("o facilitador de pagamento patrocina o gás")
+  payout_wallets:
+    agentum_lat: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+    business_agentum_lat: '0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F'
+  note: Two payout wallets on purpose — the MCP server validates each route against the wallet that belongs to it and aborts on a mismatch.
+plans:
+- name: Pay per call (x402)
+  price: per operation, see prices
+  currency: USD
+  billing_period: per-call
+  cta: none — send the request, pay the 402 challenge, receive the result
+  included_quota: null
+  overage: null
+  limits:
+    rate_limit: 10 requests / 60 s on agentum.lat, 120 / 60 s on business.agentum.lat (rate-limits/agentum-lat-rate-limits.yml)
+    account: none required
+    api_key: none
+  prices:
+  - operation: GET /verificar-cnpj
+    host: agentum.lat
+    price_usd: 0.02
+    challenge_amount_atomic: '20000'
+    confirmed_live: true
+  - operation: GET /taxas-brasil
+    host: agentum.lat
+    price_usd: 0.01
+    challenge_amount_atomic: '10000'
+    confirmed_live: true
+  - operation: GET /verificar-cep
+    host: agentum.lat
+    price_usd: 0.01
+  - operation: GET /validar-cpf
+    host: agentum.lat
+    price_usd: 0.01
+  - operation: POST /business-intelligence
+    host: agentum.lat
+    price_usd: 0.05
+    challenge_amount_atomic: '50000'
+    confirmed_live: true
+  - operation: GET /fx-rates
+    host: agentum.lat
+    price_usd: 0.01
+    challenge_amount_atomic: '10000'
+    confirmed_live: true
+  - operation: GET /economic-data
+    host: agentum.lat
+    price_usd: 0.01
+  - operation: GET /vat-validate
+    host: agentum.lat
+    price_usd: 0.01
+  - operation: GET /company-enrich
+    host: agentum.lat
+    price_usd: 0.01
+  - operation: GET /company
+    host: business.agentum.lat
+    price_usd: 0.02
+  - operation: GET /company-intelligence
+    host: business.agentum.lat
+    price_usd: 0.02
+    challenge_amount_atomic: '20000'
+    confirmed_live: true
+  - operation: GET /preflight
+    host: business.agentum.lat
+    price_usd: 0.15
+    challenge_amount_atomic: '150000'
+    confirmed_live: true
+  - operation: A2A skill repo_intelligence
+    host: business.agentum.lat
+    price_usd: 0
+    note: 'Card text: "Grátis nesta rodada de laboratório (sem cobrança x402 ainda)" — free in this lab round, x402 charging not yet applied.'
+free_tier: none
+trial: none
+enterprise: none published

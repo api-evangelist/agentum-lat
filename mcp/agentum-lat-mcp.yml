@@ -1,0 +1,298 @@
+generated: '2026-09-19'
+method: searched
+status: published
+source: https://github.com/orionlabsai/agentum-mcp-server
+sources:
+- https://registry.npmjs.org/@agentum%2Fmcp-server (dist-tags.latest 1.2.4, published 2026-09-12; first release 1.0.0 on 2026-09-08)
+- https://raw.githubusercontent.com/orionlabsai/agentum-mcp-server/main/index.js (tool registrations read at the published version)
+- https://raw.githubusercontent.com/orionlabsai/agentum-mcp-server/main/server.json (MCP registry manifest)
+- https://raw.githubusercontent.com/orionlabsai/agentum-mcp-server/main/manifest.json (desktop-extension manifest 0.3)
+- 'https://agentum.lat/llms.txt (names the package: "Todas as 10 rotas também estão disponíveis como ferramentas MCP ... no pacote npm @agentum/mcp-server")'
+server:
+  name: agentum-mcp
+  display_name: AGENTUM
+  mcp_name: io.github.orionlabsai/agentum-mcp-server
+  transport: stdio
+  hosted: false
+  package: '@agentum/mcp-server'
+  version: 1.2.4
+  published: '2026-09-12'
+  self_reported_version: 1.0.0 (the McpServer constructor string in index.js lags the npm version)
+  command: npx -y @agentum/mcp-server
+  bin: agentum-mcp
+  sdk: '@modelcontextprotocol/sdk ^1.30.0 — McpServer + StdioServerTransport'
+  license: MIT
+  description: (Portuguese) AGENTUM's MCP server — exposes the eleven paid HTTP routes (nine on agentum.lat, two on business.agentum.lat) as MCP tools so any MCP-capable
+    agent host can call them and pay per call in USDC over x402 without knowing the protocol or writing payment code. The installer supplies THEIR OWN wallet (AGENTUM_MCP_WALLET_KEY);
+    every tool call is a real on-chain payment on Base mainnet.
+deployment:
+  mode: local-stdio
+  endpoint: null
+  install: npx -y @agentum/mcp-server
+  package: https://www.npmjs.com/package/@agentum/mcp-server
+  auth: none
+  payment: x402 v2 — the caller's own Base wallet private key (env AGENTUM_MCP_WALLET_KEY, required, secret) signs a USDC payment per tool call; there is no provider-issued
+    credential
+  verified: searched
+  checked: '2026-09-19'
+  note: 'No remote endpoint exists: mcp.agentum.lat does not resolve and /mcp returns 404 on both hosts, so an agent cannot reach these tools without a human installing
+    the package on a machine first. tools/list was not executed (running the package requires a funded wallet key); the tool set below is read verbatim from the published
+    source, which is the same code npm distributes.'
+authorship: provider (first-party — manifest.json author AGENTUM, agentumcomercial@carmozinog.com, https://agentum.lat)
+client_configuration:
+  claude_desktop: '{"mcpServers":{"agentum":{"command":"npx","args":["-y","@agentum/mcp-server"],"env":{"AGENTUM_MCP_WALLET_KEY":"<your wallet private key>"}}}}'
+  claude_code: claude mcp add agentum -e AGENTUM_MCP_WALLET_KEY=$AGENTUM_MCP_WALLET_KEY -- npx -y @agentum/mcp-server
+  cursor: same JSON as Claude Desktop in ~/.cursor/mcp.json
+  wallet_requirement: a dedicated Ethereum wallet holding USDC on Base mainnet (eip155:8453); the README says the facilitator sponsors gas so no ETH is needed, and
+    warns never to use a wallet holding other funds and that the key sits in plaintext config
+tool_count: 11
+tools:
+- name: verificar_cnpj
+  title: Verificar CNPJ
+  description: Real-time Brazilian CNPJ check (registration status, Simples Nacional, address). $0.02 USDC.
+  inputSchema:
+    cnpj:
+      type: string
+      required: true
+      description: CNPJ brasileiro, 14 dígitos, com ou sem pontuação
+  outputSchema:
+  - cnpj
+  - razao_social
+  - situacao
+  - data_situacao
+  - abertura
+  - natureza_juridica
+  - uf
+  - municipio
+  - atividade_principal
+  - fonte (enum brasilapi|receitaws)
+  backing_route: GET https://agentum.lat/verificar-cnpj?cnpj=
+  source_operation: openapi/agentum-lat-apis-brasil-openapi.json#verificarCnpj
+  price_usd: 0.02
+  spend_cap_atomic: '30000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+- name: taxas_brasil
+  title: Taxas oficiais do Brasil
+  description: Official Brazilian rates in real time (Selic, CDI, commercial dollar). $0.01 USDC.
+  inputSchema: {}
+  outputSchema:
+  - selic_meta_aa (valor, data, unidade)
+  - cdi_ad (valor, data, unidade)
+  - dolar_comercial_venda (valor, data, unidade)
+  - fonte
+  backing_route: GET https://agentum.lat/taxas-brasil
+  source_operation: openapi/agentum-lat-apis-brasil-openapi.json#taxasBrasil
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+- name: verificar_cep
+  title: Verificar CEP
+  description: Real-time Brazilian CEP/address validation. $0.01 USDC.
+  inputSchema:
+    cep:
+      type: string
+      required: true
+      description: CEP brasileiro, 8 dígitos, com ou sem hífen
+  backing_route: GET https://agentum.lat/verificar-cep?cep=
+  source_operation: openapi/agentum-lat-apis-brasil-openapi.json#verificarCep
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+- name: validar_cpf
+  title: Validar CPF
+  description: Confirms whether a Brazilian CPF is mathematically valid (check digit) — looks up no personal data. $0.01 USDC.
+  inputSchema:
+    cpf:
+      type: string
+      required: true
+      description: CPF brasileiro, 11 dígitos, com ou sem pontuação
+  backing_route: GET https://agentum.lat/validar-cpf?cpf=
+  source_operation: null
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+  contract_status: not in the published OpenAPI (route live — 402 observed 2026-09-19)
+- name: business_intelligence
+  title: Inteligência empresarial (CNPJ completo)
+  description: Full Brazilian business intelligence — registration status, address, activities, partners (CPF always masked by the Receita Federal itself) and an
+    AI-generated summary from official data only. $0.05 USDC.
+  inputSchema:
+    cnpj:
+      type: string
+      required: true
+      description: CNPJ brasileiro, 14 dígitos, com ou sem pontuação
+  outputSchema:
+  - company
+  - registration
+  - address
+  - activities
+  - signals
+  - summary
+  - sources
+  - confidence
+  - queriedAt
+  backing_route: POST https://agentum.lat/business-intelligence (JSON body {cnpj})
+  source_operation: openapi/agentum-lat-apis-brasil-openapi.json#businessIntelligence
+  price_usd: 0.05
+  spend_cap_atomic: '70000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+- name: fx_rates
+  title: Câmbio (qualquer moeda)
+  description: Official real-time FX rates (ECB via Frankfurter), any currency pair. $0.01 USDC.
+  inputSchema:
+    base:
+      type: string
+      required: false
+      description: 'Moeda base (ISO 4217, ex: USD). Default: USD'
+    symbols:
+      type: string
+      required: false
+      description: 'Moedas de destino separadas por vírgula (ex: BRL,EUR). Default: BRL,EUR,USD'
+  outputSchema:
+  - base
+  - date
+  - rates (map currency -> number)
+  - fonte
+  backing_route: GET https://agentum.lat/fx-rates?base=&symbols=
+  source_operation: null
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+  contract_status: not in the published OpenAPI (route live — 402 observed 2026-09-19)
+- name: economic_data
+  title: Indicadores econômicos (qualquer país)
+  description: Official economic indicators (World Bank) for any country — GDP growth, inflation, unemployment, population. $0.01 USDC.
+  inputSchema:
+    country:
+      type: string
+      required: true
+      description: 'Código ISO 3166-1 alpha-2 do país (ex: BR, US, DE)'
+    metric:
+      type: string
+      required: true
+      description: Indicador desejado
+      enum:
+      - gdp_growth
+      - inflation
+      - unemployment
+      - population
+  backing_route: GET https://agentum.lat/economic-data?country=&metric=
+  source_operation: null
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+  contract_status: not in the published OpenAPI (route live — 402 observed 2026-09-19)
+- name: vat_validate
+  title: Validar VAT europeu
+  description: Real-time EU VAT number validation (VIES, the official EU service). $0.01 USDC.
+  inputSchema:
+    country:
+      type: string
+      required: true
+      description: 'Código de país da UE, 2 letras (ex: IE, DE, FR)'
+    vat:
+      type: string
+      required: true
+      description: Número de VAT, sem o prefixo do país
+  outputSchema:
+  - country
+  - vat
+  - valido (boolean)
+  backing_route: GET https://agentum.lat/vat-validate?country=&vat=
+  source_operation: null
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+  contract_status: not in the published OpenAPI (route live — 402 observed 2026-09-19)
+- name: company_enrich
+  title: Identificação global de empresa (LEI)
+  description: Global company identification via LEI (GLEIF) — search by name or LEI code, any country. $0.01 USDC.
+  inputSchema:
+    name:
+      type: string
+      required: false
+      description: Nome (ou parte do nome) da empresa a buscar
+    lei:
+      type: string
+      required: false
+      description: Código LEI de 20 caracteres, se já souber
+  outputSchema:
+  - lei
+  - legalName
+  - jurisdiction
+  - status
+  - registrationStatus
+  - fonte
+  backing_route: GET https://agentum.lat/company-enrich?name=|lei=
+  source_operation: null
+  price_usd: 0.01
+  spend_cap_atomic: '20000'
+  pay_to: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+  contract_status: not in the published OpenAPI (route live — 402 observed 2026-09-19)
+  input_rule: at least one of name or lei is required (enforced client-side in the tool)
+- name: company_intelligence_br
+  title: Inteligência empresarial + compliance (CNPJ, sistema AGENTUM Business)
+  description: Evidence-based company investigation for a Brazilian CNPJ — registration plus official compliance sources TCU, CNIA/CNJ, CEIS, CNEP and CVM; facts
+    and per-source coverage only, never an invented score. $0.02 USDC, separate system and wallet.
+  inputSchema:
+    cnpj:
+      type: string
+      required: true
+      description: CNPJ brasileiro, 14 dígitos, com ou sem pontuação
+  backing_route: GET https://business.agentum.lat/company-intelligence?cnpj=
+  source_operation: openapi/agentum-lat-business-openapi.json#companyIntelligence
+  price_usd: 0.02
+  spend_cap_atomic: '30000'
+  pay_to: '0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F'
+- name: preflight
+  title: Verificação de contraparte (CNPJ, LEI ou nome de empresa)
+  description: Accepts a CNPJ, a 20-character LEI or a company name and returns a consolidated counterparty verdict — entity, risk band (clear/flagged/insufficient_data),
+    data-coverage confidence and per-source findings; band/flags derived deterministically from verified public facts. $0.15 USDC, separate system and wallet.
+  inputSchema:
+    q:
+      type: string
+      required: true
+      description: CNPJ brasileiro (14 dígitos), código LEI (20 caracteres), ou nome de empresa
+  outputSchema:
+  - query (type, value)
+  - entity (name, jurisdiction, identifier, status)
+  - band
+  - confidence
+  - flags[]
+  - components[]
+  - sources[]
+  - coverage
+  - as_of
+  - version
+  - disclaimer
+  backing_route: GET https://business.agentum.lat/preflight?q=
+  source_operation: openapi/agentum-lat-business-openapi.json#preflight
+  price_usd: 0.15
+  spend_cap_atomic: '200000'
+  pay_to: '0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F'
+annotations:
+  applied_to: every tool (PAID_QUERY_ANNOTATIONS)
+  readOnlyHint: false
+  destructiveHint: false
+  idempotentHint: false
+  openWorldHint: true
+  note: All eleven tools are reads of public data, yet the provider marks readOnlyHint false and idempotentHint false — consistent with each call spending the user's
+    money and a repeat call spending it again.
+spend_controls:
+  network: pinned to eip155:8453 only (x402Client.register on the exact chain, no wildcard)
+  asset: USDC 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 only (setSpendControls allowedAssets)
+  per_route_cap: maxAmountPerPayment per route, slightly above the published price (see spend_cap_atomic)
+  pay_to_check: onBeforePaymentCreation aborts unless the selected requirement's payTo equals the wallet registered for that route
+  design_note: the source documents a TOCTOU audit finding (2026-09-08) — validation is applied to the exact requirement the SDK signs, not to a separate pre-flight
+    request
+coverage:
+  http_routes: 12
+  routes_with_tools: 11
+  route_without_tool: GET https://business.agentum.lat/company
+  crosswalk: mcp/agentum-lat-tool-crosswalk.yml
+related:
+- type: package
+  url: https://www.npmjs.com/package/@agentum/x402-spend-guard
+  note: buyer-side spend-policy library by the same provider
+- type: a2a
+  url: https://business.agentum.lat/.well-known/agent-card.json

@@ -1,0 +1,78 @@
+generated: '2026-09-19'
+method: derived
+source:
+- openapi/agentum-lat-apis-brasil-openapi.json
+- openapi/agentum-lat-business-openapi.json
+note: >-
+  Neither contract declares components.schemas or $ref links — every schema is inline under its operation's
+  200 response — so the graph below is read from inline object shapes and shared identifier fields. Entities
+  are named by API Evangelist for the derivation; the field names are the provider's. Five routes on
+  agentum.lat (validar-cpf, fx-rates, economic-data, vat-validate, company-enrich) are outside the published
+  contract and their response shapes are known only from the MCP tool outputSchema (index.js) and the
+  Bazaar output examples in their 402 challenges; they are listed under undocumented_shapes and not asserted
+  as contract.
+identifiers:
+- {name: CNPJ, format: 14 digits (Receita Federal company registry), used_by: [verificarCnpj, businessIntelligence, company, companyIntelligence, preflight]}
+- {name: CEP, format: 8 digits (Brazilian postal code), used_by: [verificarCep]}
+- {name: LEI, format: 20 characters (ISO 17442), used_by: [preflight, company-enrich (undocumented)]}
+- {name: CPF, format: 11 digits, used_by: [validar-cpf (undocumented; check digit only)]}
+entities:
+- name: CompanyRegistration
+  description: Basic Receita Federal registration of a Brazilian company.
+  sources:
+  - openapi/agentum-lat-apis-brasil-openapi.json#verificarCnpj (fields cnpj, razao_social, situacao, data_situacao, abertura, natureza_juridica, uf, municipio, atividade_principal, fonte)
+  - openapi/agentum-lat-business-openapi.json#company (fields razaoSocial, nomeFantasia, situacaoCadastral, naturezaJuridica, dataAbertura, cnaePrincipal, capitalSocial, porte, simplesNacional, endereco, fonte)
+  key: cnpj
+  provenance_field: >-
+    fonte (enum observed in MCP outputSchema: brasilapi | receitaws)
+- name: Address
+  description: Brazilian street address.
+  sources:
+  - openapi/agentum-lat-business-openapi.json#company.endereco (logradouro, numero, bairro, municipio, uf, cep — all nullable)
+  - openapi/agentum-lat-apis-brasil-openapi.json#businessIntelligence.address
+  - openapi/agentum-lat-apis-brasil-openapi.json#verificarCep (cep, logradouro, bairro, municipio, uf, regiao, ddd, fonte)
+- name: BusinessIntelligenceReport
+  description: Consolidated CNPJ report with an AI-generated summary from official data only.
+  sources:
+  - openapi/agentum-lat-apis-brasil-openapi.json#businessIntelligence (company, registration, address, activities[], signals[], summary, sources[], confidence (number), queriedAt)
+  key: company.cnpj
+  note: The Bazaar output example for this route also shows a partners[] array (sócios with masked CPF) not present in the contract's response schema.
+- name: IntegrityFinding
+  description: One fact from a public-integrity registry about a CNPJ.
+  sources:
+  - openapi/agentum-lat-business-openapi.json#companyIntelligence.findings[] (source, sourceType enum [official_api, official_dataset], status, fact, observedAt)
+- name: CompanyIntelligence
+  description: Registration crossed with integrity findings, coverage and derived findings.
+  sources:
+  - openapi/agentum-lat-business-openapi.json#companyIntelligence (cnpj, company, findings[], coverage, derivedFindings[], performance, generatedAt)
+  key: cnpj
+- name: CounterpartyVerdict
+  description: Deterministic preflight verdict for a CNPJ, LEI or company name.
+  sources:
+  - openapi/agentum-lat-business-openapi.json#preflight (query {type enum [cnpj, lei, name], value}, entity {name, jurisdiction, identifier {type, value}, status}, band enum [clear, flagged, insufficient_data], confidence enum [high, medium, low], flags[] {code, source, fact}, components[] {source, status enum [verified, not_found_in_checked_sources, unavailable, not_applicable, conflicting], fact, observedAt}, sources[] {name, reference}, coverage, as_of, version, disclaimer)
+  key: entity.identifier
+- name: OfficialRates
+  description: Banco Central SGS series snapshot.
+  sources:
+  - openapi/agentum-lat-apis-brasil-openapi.json#taxasBrasil (selic_meta_aa, cdi_ad, dolar_comercial_venda — each {valor, data, unidade}; fonte)
+relationships:
+- {from: CompanyRegistration, to: Address, type: has_one, via: endereco / address}
+- {from: BusinessIntelligenceReport, to: CompanyRegistration, type: has_one, via: company + registration}
+- {from: BusinessIntelligenceReport, to: Address, type: has_one, via: address}
+- {from: CompanyIntelligence, to: CompanyRegistration, type: has_one, via: company (same cnpj)}
+- {from: CompanyIntelligence, to: IntegrityFinding, type: has_many, via: 'findings[]'}
+- {from: CounterpartyVerdict, to: IntegrityFinding, type: has_many, via: 'components[] (same source/status/fact/observedAt shape)'}
+- {from: CounterpartyVerdict, to: CompanyRegistration, type: belongs_to, via: entity.identifier (type cnpj) — resolved through the same registry lookup as /company}
+- {from: IntegrityFinding, to: Source, type: belongs_to, via: source / sourceType}
+undocumented_shapes:
+- route: GET /validar-cpf
+  known_from: MCP tool validar_cpf outputSchema
+- route: GET /fx-rates
+  known_from: MCP tool fx_rates outputSchema (base, date, rates map, fonte) and the Bazaar example in its 402 challenge
+- route: GET /economic-data
+  known_from: MCP tool economic_data (country ISO 3166-1 alpha-2, metric enum gdp_growth | inflation | unemployment | population)
+- route: GET /vat-validate
+  known_from: MCP tool vat_validate outputSchema (country, vat, valido)
+- route: GET /company-enrich
+  known_from: MCP tool company_enrich outputSchema (lei, legalName, jurisdiction, status, registrationStatus, fonte)
+render: null

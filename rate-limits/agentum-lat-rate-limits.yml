@@ -1,0 +1,72 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Observed on live unauthenticated responses on 2026-09-19: the RateLimit-Policy / RateLimit-Limit /
+  RateLimit-Remaining / RateLimit-Reset headers returned on every 402 challenge on both hosts, and the 429 that
+  agentum.lat returned on the eleventh request inside one minute (thirteen sequential GETs of /taxas-brasil;
+  requests 1-10 answered 402 with Remaining counting 9 -> 0, requests 11-13 answered 429). No payment was made
+  and no document describes the limits — the headers are the only publication of them.
+docs: null
+limit_count: 2
+summary: >-
+  Two fixed windows, one per host, signalled with the IETF RateLimit header fields (draft-ietf-httpapi-ratelimit-headers)
+  and enforced with 429 + Retry-After. agentum.lat allows 10 requests per 60 seconds per client;
+  business.agentum.lat allows 120 per 60 seconds. Unpaid 402 challenges count against the window exactly like
+  paid calls, so an agent that retries a challenge without paying burns its own quota. The partition key
+  (per IP is the obvious reading; observed from a single address) is not documented.
+rate_limits:
+- name: APIs Brasil per-client window
+  scope: per-client
+  partition: undocumented (observed per source address)
+  limit: 10
+  window: 60s
+  metric: request
+  burst: null
+  applies_to: every route on agentum.lat, including unpaid 402 challenges
+  domains:
+  - agentum.lat
+  headers:
+    policy: 'RateLimit-Policy: 10;w=60'
+    limit: 'RateLimit-Limit: 10'
+    remaining: 'RateLimit-Remaining: <n>'
+    reset: 'RateLimit-Reset: 60'
+  on_exhaustion:
+    status: 429
+    retry_after: 'Retry-After: 60'
+    body: '{"error":"muitas tentativas — espera um pouco"}'
+    content_type: application/json; charset=utf-8
+  observed:
+    url: https://agentum.lat/taxas-brasil
+    sequence: '10 x 402 (Remaining 9..0) then 429 on requests 11, 12, 13 within the same 60 s window'
+- name: AGENTUM Business per-client window
+  scope: per-client
+  partition: undocumented (observed per source address)
+  limit: 120
+  window: 60s
+  metric: request
+  burst: null
+  applies_to: every route on business.agentum.lat, including the A2A JSON-RPC root and /health
+  domains:
+  - business.agentum.lat
+  headers:
+    policy: 'RateLimit-Policy: 120;w=60'
+    limit: 'RateLimit-Limit: 120'
+    remaining: 'RateLimit-Remaining: <n>'
+    reset: 'RateLimit-Reset: <seconds>'
+  on_exhaustion:
+    status: 429
+    retry_after: not observed (window not exhausted; inferred from the agentum.lat behaviour of the same middleware, not asserted)
+  observed:
+    url: https://business.agentum.lat/company-intelligence?cnpj=68964713000109
+    headers_seen: 'RateLimit-Policy: 120;w=60, RateLimit-Limit: 120, RateLimit-Remaining: 101, RateLimit-Reset: 10'
+response_headers:
+- RateLimit-Policy
+- RateLimit-Limit
+- RateLimit-Remaining
+- RateLimit-Reset
+- Retry-After (429 only)
+exhaustion_status: 429
+agent_guidance: >-
+  Read RateLimit-Remaining on every response (including 402s); when it reaches 0, sleep RateLimit-Reset /
+  Retry-After seconds. Do not poll a 402 route while waiting for payment settlement — settle and retry once
+  with the payment header.

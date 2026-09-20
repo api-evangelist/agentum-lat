@@ -1,0 +1,94 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentum.lat/llms.txt
+derived_from:
+- openapi/agentum-lat-apis-brasil-openapi.json
+- openapi/agentum-lat-business-openapi.json
+- live responses on 2026-09-19 (402 challenges, 429, 400 validation, A2A JSON-RPC errors)
+- https://github.com/orionlabsai/agentum-mcp-server (index.js, README)
+docs:
+- https://agentum.lat/
+- https://agentum.lat/llms.txt
+base_urls:
+  apis_brasil: https://agentum.lat
+  business: https://business.agentum.lat
+  a2a_jsonrpc: https://business.agentum.lat/
+media_type: application/json; charset=utf-8
+language: Descriptions, error messages and most field names are Brazilian Portuguese (pt-BR). agentum.lat uses snake_case Portuguese fields (razao_social, situacao, dolar_comercial_venda); business.agentum.lat uses camelCase (razaoSocial, situacaoCadastral, generatedAt) — two naming conventions across the two hosts.
+auth:
+  style: none — no API key, no OAuth, no account. Access is gated by x402 payment per request.
+  detail: authentication/agentum-lat-authentication.yml
+payment:
+  protocol: x402 v2, scheme exact
+  network: eip155:8453 (Base mainnet)
+  asset: USDC 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 (6 decimals; amount "10000" = $0.01)
+  challenge: 'HTTP 402 with PAYMENT-REQUIRED: <base64 JSON PaymentRequirements> (and, on business.agentum.lat, a JSON body {"error":"PAYMENT_REQUIRED","message":"Payment required"}; agentum.lat''s body is {})'
+  timeout: maxTimeoutSeconds 300 per challenge
+  discovery: extensions.bazaar in every challenge carries the input shape (method, queryParams or JSON body) and an output example plus a JSON Schema 2020-12 for both
+  payTo:
+    agentum_lat: '0xB4f9061e3a6A5533431336506b34e1035029599f'
+    business_agentum_lat: '0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F'
+  price_declaration: >-
+    per operation in OpenAPI x-payment-info {price {mode fixed, currency USD, amount}, protocols [{x402: {}}]}; the same prices on the homepage, llms.txt and in the challenge amount
+  reference_client: '@x402/fetch wrapFetchWithPayment, as used by @agentum/mcp-server; the provider''s own client pins the network with register() on the exact chain, caps the amount per route with setSpendControls, and rejects any payTo other than the two wallets above in onBeforePaymentCreation'
+  validation_order: the payment gate answers BEFORE input validation — GET /verificar-cnpj?cnpj=123, /company?cnpj=123 and /preflight?q= all returned 402, so a malformed identifier is challenged like a valid one and the contract's 400 is only reachable after payment; validate client-side
+idempotency:
+  coverage: na
+  supported: false
+  mechanism: null
+  header: null
+  scope: []
+  retention: null
+  description: >-
+    There is no mutating surface: every operation is a paid read (the one POST, /business-intelligence, is a
+    query that takes its CNPJ in a JSON body). The provider publishes no idempotency mechanism and none is
+    needed for state — but every repeated call is a repeated charge, and nothing on the server side
+    recognises a duplicate query, so the replay risk here is financial rather than data corruption. Client
+    guidance: cache results by identifier (responses carry queriedAt / generatedAt / as_of) and do not retry
+    a 402 without a fresh payment decision.
+reversibility:
+  applicability: na
+  write_surface: none — no create/update/delete operations in either contract
+  reversal_operations: []
+  refunds: >-
+    No refund, void or reversal operation exists and none is documented. A payment is an on-chain USDC
+    transfer settled before the response; the provider states no refund policy. Not graded (no write surface),
+    recorded so an agent knows a charged call cannot be taken back.
+dry_run:
+  applicability: na
+  test_mode: none — mainnet only; the MCP README suggests testing with "a few cents" of real USDC. No sandbox/ artifact is emitted.
+pagination:
+  style: none
+  note: Every operation returns one object.
+filtering_and_sorting: none
+field_expansion: none
+metadata: none
+request_tracing:
+  request_id_header: none observed
+  response_headers_observed: [ETag (weak), Cache-Control no-store, Strict-Transport-Security max-age=31536000; includeSubDomains, X-Content-Type-Options nosniff, X-Frame-Options DENY, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy, Content-Security-Policy default-src 'self']
+caching:
+  policy: 'Cache-Control: no-store on API responses'
+  data_freshness: responses embed their own timestamps — queriedAt (businessIntelligence), generatedAt (companyIntelligence), as_of (preflight), and per-series data dates on taxasBrasil (dd/mm/yyyy strings)
+versioning:
+  scheme: none-in-uri
+  detail: lifecycle/agentum-lat-lifecycle.yml
+  a2a: the JSON-RPC root requires an A2A-Version 1.0 header; without it every call is refused with -32009
+errors:
+  envelope_business: '{"error": CODE, "message": text}'
+  envelope_agentum_lat: '{} on 402, {"error": text} otherwise'
+  format: ad hoc JSON (not RFC 9457)
+  detail: errors/agentum-lat-problem-types.yml
+rate_limits:
+  signalling: RateLimit-Policy, RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset on every response; 429 + Retry-After on exhaustion
+  limits: 10/60 s (agentum.lat), 120/60 s (business.agentum.lat)
+  detail: rate-limits/agentum-lat-rate-limits.yml
+data_types:
+  identifiers: CNPJ 14 digits (accepted with or without mask on business.agentum.lat, digits-only on agentum.lat per the contract), CEP 8 digits, CPF 11 digits, LEI 20 characters, ISO 4217 currency codes, ISO country codes for economic-data/vat-validate
+  numbers: taxasBrasil returns numeric values as strings with a separate unidade field; fx-rates returns numbers
+  timestamps: ISO 8601 on business.agentum.lat and businessIntelligence; Brazilian dd/mm/yyyy on verificarCnpj and taxasBrasil
+  nullability: business.agentum.lat schemas declare ["string","null"] unions (OpenAPI 3.1 style) for optional registry fields
+agent_guidance:
+- Validate identifiers locally first (14/8/11 digits, 20-char LEI) — the 402 gate answers before the server validates, so a malformed query is challenged like a valid one and the contract's 400 is only reachable after payment.
+- Treat preflight band "insufficient_data" as unknown, never as clear; the contract says band/flags are derived deterministically from verified facts and no score is fabricated.
+- Read RateLimit-Remaining on every response including 402s; back off on 0.
+- The two hosts pay to different wallets; a client that pins payTo (as the provider's MCP server does) must allow both.

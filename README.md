@@ -64,5 +64,13 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-AGENTUM is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://agentum.lat/
+AGENTUM (AGENTUM LTDA, Sertãozinho, São Paulo, Brazil) is a "payment agent" data provider: eleven HTTP endpoints sold per call over the x402 protocol (USDC on Base mainnet) with no account, no API key and no subscription. Nine routes on agentum.lat cover Brazilian and global company and market data (CNPJ, CEP, CPF, Banco Central rates, ECB FX, World Bank indicators, EU VIES VAT, GLEIF LEI, an AI-summarised CNPJ report) and three on business.agentum.lat (AGENTUM Business) add counterparty compliance checks (TCU, CEIS/CNEP, CNJ, CVM) and a preflight verdict. The same routes ship as eleven tools in the `@agentum/mcp-server` npm package (stdio), and AGENTUM Business is an A2A 1.0 JSON-RPC agent with a card at `business.agentum.lat/.well-known/agent-card.json`.
+
+- Website and route list: https://agentum.lat/
+- llms.txt: https://agentum.lat/llms.txt
+- OpenAPI (partial, 4 of 9 routes): https://agentum.lat/openapi.json
+- OpenAPI (AGENTUM Business): https://business.agentum.lat/openapi.json
+- A2A agent card: https://business.agentum.lat/.well-known/agent-card.json
+- MCP server: https://github.com/orionlabsai/agentum-mcp-server
+
+Profiled by the API Evangelist enrichment pipeline on 2026-09-19 from the public surfaces above; every artifact in this repository records how it was obtained (`method: searched | probed | derived | generated`). Surfaced originally via a2aregistry.org.

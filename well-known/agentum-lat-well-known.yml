@@ -1,0 +1,173 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Live GET probes of the named /.well-known/* path list (plus /apis.json, /apis.yml, /llms.txt and
+  /openapi.json) on agentum.lat, www.agentum.lat and business.agentum.lat on 2026-09-19. Every row below is a
+  request that was actually issued; every status is the one returned. Unserved paths on both origin hosts
+  return a real Express "Cannot GET <path>" HTML 404 (~150 bytes), so every 200 below is a served document and
+  not an SPA catch-all. There is no MCP host to probe: the provider's MCP server is a local stdio package
+  (@agentum/mcp-server), not a remote endpoint (see mcp/agentum-lat-mcp.yml).
+summary:
+  hosts_probed: 3
+  paths_probed: 45
+  documents_served: 5
+  served:
+  - https://agentum.lat/.well-known/security.txt (RFC 9116; Contact + Expires)
+  - https://agentum.lat/llms.txt
+  - https://agentum.lat/openapi.json (partial OpenAPI 3.1.0, 4 of 9 routes)
+  - https://business.agentum.lat/.well-known/agent-card.json (A2A 1.0 agent card, saved to a2a/)
+  - https://business.agentum.lat/openapi.json (OpenAPI 3.1.0, 3 routes)
+  absent: >-
+    No OAuth/OIDC discovery (openid-configuration, oauth-authorization-server, oauth-protected-resource) on any
+    host — consistent with an API that has no authentication at all and is gated by x402 payment instead. No
+    RFC 9727 api-catalog, no ai-plugin.json, no UCP/ACP commerce documents, no AAuth resource document, no
+    APIs.json on any host, and no /.well-known/x402 manifest (the x402 challenge itself, with its Bazaar
+    discovery extension, is served inline on each paid route instead).
+hosts:
+- host: agentum.lat
+  role: Primary website, APIs Brasil host (nine paid routes) and the only host serving security.txt and llms.txt
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    file: agentum-lat-security.txt
+    standard: RFC 9116
+    note: 'Two fields: Contact: mailto:carmozinog@carmozinog.com and Expires: 2027-01-01T00:00:00Z. No Policy, Encryption, Canonical or Preferred-Languages line, and the file is not signed.'
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+    note: The A2A card is served from business.agentum.lat, not the apex.
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/x402
+    status: 404
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    file: ../llms/agentum-lat-llms.txt
+    note: Lists all ten paid routes with method, price and one-line purpose, names the npm MCP package, and states that /openapi.json is a partial schema.
+  - path: /openapi.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../openapi/agentum-lat-apis-brasil-openapi.json
+    note: OpenAPI 3.1.0, info.title "AGENTUM — APIs Brasil", servers[0] https://agentum.lat, four operations.
+  - path: /robots.txt
+    status: 404
+- host: www.agentum.lat
+  role: Alias — every path 301-redirects to the same path on agentum.lat
+  documents:
+  - path: /.well-known/security.txt
+    status: 301
+    note: Location https://agentum.lat/.well-known/security.txt; followed, the apex document above is returned.
+  - path: /.well-known/openid-configuration
+    status: 301
+  - path: /.well-known/oauth-authorization-server
+    status: 301
+  - path: /.well-known/oauth-protected-resource
+    status: 301
+  - path: /.well-known/api-catalog
+    status: 301
+  - path: /.well-known/ai-plugin.json
+    status: 301
+  - path: /.well-known/ucp.json
+    status: 301
+  - path: /.well-known/acp.json
+    status: 301
+  - path: /.well-known/aauth-resource.json
+    status: 301
+  - path: /.well-known/apis.json
+    status: 301
+  - path: /apis.json
+    status: 301
+  - path: /apis.yml
+    status: 301
+  - path: /.well-known/agent-card.json
+    status: 301
+  - path: /.well-known/agent.json
+    status: 301
+- host: business.agentum.lat
+  role: AGENTUM Business — separate service (own process and payout wallet) serving the A2A agent card, its OpenAPI, a JSON service index at / and /health
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../a2a/agentum-lat-agent-card.json
+    standard: A2A 1.0 Agent Card
+    note: 1,976 bytes; name "AGENTUM Business", provider.organization AGENTUM, provider.url https://agentum.lat, two skills. Graded in a2a/agentum-lat-a2a.yml.
+  - path: /.well-known/agent.json
+    status: 404
+    note: Legacy pre-0.3 path not served; only the canonical path answers.
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/x402
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /openapi.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../openapi/agentum-lat-business-openapi.json
+    note: OpenAPI 3.1.0, info.title "AGENTUM Business", version 0.1.0, servers[0] https://business.agentum.lat, three operations.
+  - path: /
+    status: 200
+    content_type: application/json; charset=utf-8
+    note: 'JSON service index: {"service":"AGENTUM Business", "agentCard": ".../.well-known/agent-card.json", "health": ".../health", "openapi": ".../openapi.json", "endpoints": {company $0.02, company-intelligence $0.02, preflight $0.15}}. Not a standard discovery document; recorded because it is the host''s own map of its surfaces.'
+  - path: /health
+    status: 200
+    content_type: application/json; charset=utf-8
+    note: '{"status":"ok","service":"agentum-business","version":"0.1.0"} — the only free diagnostic on either host.'
+negative_controls:
+- url: https://agentum.lat/nonexistent-route-control
+  status: 404
+  note: Express HTML "Cannot GET /nonexistent-route-control"; unknown paths are real 404s on both hosts.
+hosts_not_resolving:
+- api.agentum.lat
+- mcp.agentum.lat
+- docs.agentum.lat

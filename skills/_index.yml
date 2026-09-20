@@ -1,0 +1,24 @@
+generated: '2026-09-19'
+method: generated
+source: >-
+  Generated from the two published OpenAPI documents plus conventions/, errors/, rate-limits/ and plans/ in
+  this repo. Every operationId named below exists verbatim in the referenced spec. No provider-published skill
+  or AGENTS.md exists (searched agentum.lat/AGENTS.md, /skills and the orionlabsai repositories).
+skills:
+- file: agentum-lat-verify-brazilian-counterparty.md
+  name: Verify a Brazilian counterparty before doing business
+  api: openapi/agentum-lat-business-openapi.json
+  operations: [company, companyIntelligence, preflight]
+- file: agentum-lat-cnpj-business-report.md
+  name: Pull a consolidated business-intelligence report on a CNPJ
+  api: openapi/agentum-lat-apis-brasil-openapi.json
+  operations: [verificarCnpj, businessIntelligence]
+- file: agentum-lat-brazil-official-rates.md
+  name: Fetch official Brazilian rates (Selic, CDI, commercial dollar)
+  api: openapi/agentum-lat-apis-brasil-openapi.json
+  operations: [taxasBrasil]
+- file: agentum-lat-validate-brazilian-address.md
+  name: Validate a Brazilian address from a CEP
+  api: openapi/agentum-lat-apis-brasil-openapi.json
+  operations: [verificarCep]
+shared_rules: agentum-lat-x402-payment-rules.md

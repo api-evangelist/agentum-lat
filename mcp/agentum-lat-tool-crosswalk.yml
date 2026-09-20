@@ -1,0 +1,92 @@
+generated: '2026-09-19'
+method: derived
+source:
+- mcp/agentum-lat-mcp.yml (11 tools read from @agentum/mcp-server index.js at 1.2.4)
+- openapi/agentum-lat-apis-brasil-openapi.json (4 operations)
+- openapi/agentum-lat-business-openapi.json (3 operations)
+- a2a/agentum-lat-agent-card.json (2 skills)
+summary: >-
+  Three projections of one HTTP surface plus one A2A-only capability. The MCP server is the widest published
+  contract — eleven tools with zod input schemas — while the two OpenAPI documents together describe only
+  seven operations, because the agentum.lat contract is partial by the provider's own statement. Six tools
+  bind one-to-one to a declared operationId (the tool's route is literally that path). Five tools call routes
+  that are live (each answered an x402 402 on 2026-09-19) but absent from the published OpenAPI, so their only
+  machine-readable input contract is the tool schema and the Bazaar schema inside the 402 challenge. One REST
+  operation (company) has no tool. The A2A company_intelligence skill overlaps the business host's registration
+  routes; repo_intelligence has no REST twin at all.
+surfaces:
+  openapi:
+  - {file: openapi/agentum-lat-apis-brasil-openapi.json, url: 'https://agentum.lat/openapi.json', gated: false, operations: 4, note: partial (4 of 9 live routes)}
+  - {file: openapi/agentum-lat-business-openapi.json, url: 'https://business.agentum.lat/openapi.json', gated: false, operations: 3}
+  mcp: {package: '@agentum/mcp-server', transport: stdio, url: null, tools_list_gated: 'not gated by auth, but running it needs a funded wallet key; tool set read from source instead', tools: 11}
+  a2a: {url: 'https://business.agentum.lat/', binding: JSONRPC, protocol_version: '1.0', skills: 2, gated: 'version-enforced (A2A-Version 1.0); skills not exercised'}
+  graphql: none
+crosswalk:
+- tool: verificar_cnpj
+  category: company-registration
+  rest: [verificarCnpj]
+  binding: rest
+  confidence: high
+  note: Tool input cnpj (with or without punctuation, stripped to 14 digits) -> query parameter cnpj on GET /verificar-cnpj.
+- tool: taxas_brasil
+  category: market-rates
+  rest: [taxasBrasil]
+  binding: rest
+  confidence: high
+- tool: verificar_cep
+  category: address
+  rest: [verificarCep]
+  binding: rest
+  confidence: high
+- tool: business_intelligence
+  category: company-intelligence
+  rest: [businessIntelligence]
+  binding: rest
+  confidence: high
+  note: Tool input cnpj -> JSON requestBody {cnpj} on POST /business-intelligence.
+- tool: company_intelligence_br
+  category: compliance
+  rest: [companyIntelligence]
+  binding: rest
+  confidence: high
+  note: Cross-host — the tool lives in the same package but calls business.agentum.lat and pays a different wallet.
+- tool: preflight
+  category: counterparty-verification
+  rest: [preflight]
+  binding: rest
+  confidence: high
+mcp_only:
+- tool: validar_cpf
+  reason: Live route GET https://agentum.lat/validar-cpf?cpf= (402 observed) not declared in the published OpenAPI; input contract only in the tool schema and the challenge's Bazaar schema.
+- tool: fx_rates
+  reason: Live route GET https://agentum.lat/fx-rates?base=&symbols= (402 observed); not in the published OpenAPI.
+- tool: economic_data
+  reason: Live route GET https://agentum.lat/economic-data?country=&metric= (402 observed); not in the published OpenAPI. metric enum [gdp_growth, inflation, unemployment, population] is declared only in the tool.
+- tool: vat_validate
+  reason: Live route GET https://agentum.lat/vat-validate?country=&vat= (402 observed); not in the published OpenAPI.
+- tool: company_enrich
+  reason: Live route GET https://agentum.lat/company-enrich?name=|lei= (402 observed); not in the published OpenAPI.
+rest_only:
+- capability: company-registration
+  operations: [company]
+  note: GET https://business.agentum.lat/company?cnpj= ($0.02) — basic registration without the integrity check; the MCP server exposes company_intelligence_br and preflight from this host but not /company.
+a2a_skills:
+- skill: company_intelligence
+  rest: [company, companyIntelligence]
+  mcp: [company_intelligence_br]
+  confidence: medium
+  note: The card describes registration fields (legal name, status, legal nature, CNAE, address, Simples Nacional) from brasilapi with a receitaws fallback — the exact description of GET /company; it does not mention the TCU/CEIS/CNEP/CVM findings that companyIntelligence adds. Bound to both because the skill name matches the richer route and the description matches the basic one; not exercised.
+- skill: repo_intelligence
+  rest: []
+  mcp: []
+  confidence: high
+  note: A2A-only. Delegates to the external DeepWiki MCP server (mcp.deepwiki.com); no AGENTUM HTTP route or tool exists for it.
+coverage:
+  tools_named: 11
+  tools_bound_to_rest: 6
+  mcp_only: 5
+  rest_operations_total: 7
+  rest_operations_with_tool: 6
+  rest_only: 1
+  a2a_skills: 2
+  a2a_skills_with_rest_twin: 1

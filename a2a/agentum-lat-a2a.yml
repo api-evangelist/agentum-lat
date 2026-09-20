@@ -1,0 +1,125 @@
+generated: '2026-09-19'
+method: probed
+source: https://business.agentum.lat/.well-known/agent-card.json
+card:
+  file: a2a/agentum-lat-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: business.agentum.lat
+  note: >-
+    Served from business.agentum.lat, a subdomain of the record's registrable domain agentum.lat, NOT from the
+    apex: https://agentum.lat/.well-known/agent-card.json and /.well-known/agent.json both return the app's
+    real Express 404 ("Cannot GET ..."), as does the legacy /.well-known/agent.json on the business host — only
+    the canonical path answers. A negative-control path on the same host returns the same 404 shape, so the
+    200 is a served document and not a catch-all. Ownership: the card's provider block is {organization
+    "AGENTUM", url "https://agentum.lat"}; the host's own OpenAPI (info.title "AGENTUM Business",
+    info.description "ver /.well-known/agent-card.json") and JSON service index at / both point at this card;
+    the OpenAPI x-guidance names payout wallet 0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F, which is the payTo
+    in the live 402 on this host and the BUSINESS_WALLET constant in the provider's npm MCP server; and
+    info.contact.email is the same agentumcomercial@carmozinog.com as the apex contract, llms.txt and the npm
+    manifest. Lead: the card was first seen on a2aregistry.org (415 agents, fetched 2026-09-19, author
+    "AGENTUM", card URL exactly this path), which is how the operator entered the harvest backlog; the card
+    above was fetched directly from the operator's host.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: '1.0'
+  protocol_version_location: supportedInterfaces[0].protocolVersion
+  preferred_transport: JSONRPC
+  transport_location: supportedInterfaces[0].protocolBinding
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  optional_fields:
+    defaultInputModes: present ([application/json, text/plain])
+    defaultOutputModes: present ([application/json])
+    preferredTransport: absent — replaced in the A2A 1.0 shape by supportedInterfaces[].protocolBinding, which is present
+    documentationUrl: absent
+    iconUrl: absent
+    securitySchemes: present but EMPTY ({}), securityRequirements []
+    signatures: present but empty ([])
+  deviations: []
+  notes:
+  - >-
+    This is a pure A2A 1.0-shaped card (supportedInterfaces with url/protocolBinding/protocolVersion/tenant;
+    no top-level url, preferredTransport, protocolVersion or additionalInterfaces). All three hard checks pass
+    with protocolVersion read from the interface entry, the same reading the catalog already applies to other
+    1.0-shaped cards. The server corroborates the declared version: an unversioned JSON-RPC request is refused
+    with -32009 "Supported versions: 1.0", and with an A2A-Version 1.0 header the 1.0 method name GetTask
+    returns the spec's -32001 TASK_NOT_FOUND error with a google.rpc.ErrorInfo data block.
+  - >-
+    securitySchemes is empty and no A2A payment extension is declared, although the HTTP twin of the
+    company_intelligence skill (GET /company-intelligence) is an x402-paid route ($0.02). Whether SendMessage
+    for that skill is charged, free, or answered with a 402 was NOT observed — no task or message was sent.
+    The repo_intelligence skill is stated free "in this lab round".
+  - capabilities.extensions is an empty array; capabilities.extendedAgentCard is false, so agent/getAuthenticatedExtendedCard is not offered.
+agent_card:
+  name: AGENTUM Business
+  description: >-
+    (Portuguese) AGENTUM's commercial/orchestrator agent: receives a job and delivers the finished result via
+    the Agent2Agent (A2A) protocol. Not a new AI model — an execution layer over real skills.
+  provider:
+    organization: AGENTUM
+    url: https://agentum.lat
+  version: 0.1.0
+  supported_interfaces:
+  - {url: 'https://business.agentum.lat/', protocolBinding: JSONRPC, protocolVersion: '1.0', tenant: ''}
+  capabilities: {streaming: true, pushNotifications: false, extensions: [], extendedAgentCard: false}
+  default_input_modes: [application/json, text/plain]
+  default_output_modes: [application/json]
+  skills: 2
+  skill_list:
+  - id: company_intelligence
+    name: Company Intelligence
+    tags: [brasil, cnpj, business-intelligence, kyb]
+    input: >-
+      a Brazilian CNPJ (14 digits, with or without mask) as JSON {"cnpj": ...} or plain text
+    output: structured company intelligence — legal name, registration status, legal nature, main CNAE, address, Simples Nacional flag — aggregated from brasilapi.com.br with a receitaws.com.br fallback
+    http_twin: GET https://business.agentum.lat/company?cnpj= (registration only) / GET /company-intelligence?cnpj= (with integrity findings) — see mcp/agentum-lat-tool-crosswalk.yml
+  - id: repo_intelligence
+    name: Repo Intelligence
+    tags: [mcp, github, documentation, technical-intelligence]
+    input: '{"repoName": "owner/repo", "question": "..."}'
+    output: a contextualised answer about that public GitHub repository's documentation/code, obtained through the external DeepWiki MCP server (mcp.deepwiki.com)
+    note: 'Card text: "Grátis nesta rodada de laboratório (sem cobrança x402 ainda)". No HTTP or OpenAPI twin; delegates to a third-party MCP server.'
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://business.agentum.lat/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  body_bytes: 1976
+  body_parses_as: JSON object with A2A 1.0 AgentCard shape (name, description, provider, version, supportedInterfaces, capabilities, securitySchemes, securityRequirements, defaultInputModes, defaultOutputModes, skills, signatures)
+  corroborating_probes:
+  - url: https://business.agentum.lat/.well-known/agent.json
+    http_status: 404
+    note: Legacy pre-0.3 path not served.
+  - url: https://agentum.lat/.well-known/agent-card.json
+    http_status: 404
+  - url: https://agentum.lat/.well-known/agent.json
+    http_status: 404
+  - url: https://business.agentum.lat/
+    method: GET
+    http_status: 200
+    note: 'JSON service index naming this card ("agentCard"), /health, /openapi.json and the three paid endpoints with prices.'
+  - url: https://business.agentum.lat/
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"agent/getAuthenticatedExtendedCard"}'
+    headers: none (no A2A-Version)
+    http_status: 500
+    note: 'JSON-RPC error -32009 "The requested A2A protocol version ''0.3'' is not supported. Supported versions: 1.0", data reason VERSION_NOT_SUPPORTED, domain a2a-protocol.org — the endpoint version-negotiates and defaults an unversioned request to 0.3.'
+  - url: https://business.agentum.lat/
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"GetTask","params":{"name":"tasks/apievangelist-nonexistent-probe","id":"apievangelist-nonexistent-probe"}}'
+    headers: 'A2A-Version: 1.0'
+    http_status: 200
+    note: 'JSON-RPC error -32001 "Task not found: apievangelist-nonexistent-probe", data reason TASK_NOT_FOUND — the A2A 1.0 method name and error code. The 0.3-style names tasks/get and message/send return -32601 "Invalid method." under the same header. No message or task was sent.'
+  - url: https://business.agentum.lat/health
+    http_status: 200
+    note: '{"status":"ok","service":"agentum-business","version":"0.1.0"} — matches the card''s version 0.1.0.'
+  - url: https://business.agentum.lat/company-intelligence?cnpj=68964713000109
+    http_status: 402
+    note: The HTTP twin of the company_intelligence skill answers an x402 v2 challenge with payTo 0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F.
+  - url: https://a2aregistry.org
+    note: Registry listing (author AGENTUM, 1 agent) was the lead; not used as evidence of the card itself.
