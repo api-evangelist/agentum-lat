@@ -1,0 +1,107 @@
+openapi: 3.2.0
+info:
+  title: AGENTUM — APIs Brasil Business Intelligence API
+  version: 1.0.0
+  description: 'APIs brasileiras pagas por chamada via x402 (USDC, Base mainnet): dado público agregado, pronto pra um agente de IA consumir numa chamada só.'
+  x-guidance: 'Use POST /business-intelligence com {"cnpj": "<14 dígitos>"} pra receber cadastro, atividades, endereço e sinais objetivos de uma empresa brasileira consolidados numa resposta estruturada só. Use GET /verificar-cnpj?cnpj=<14 dígitos> pra checar situação cadastral, Simples Nacional e endereço de uma empresa brasileira antes de fechar negócio. Use GET /verificar-cep?cep=<8 dígitos> pra validar um endereço brasileiro antes de despachar algo. Use GET /taxas-brasil (sem parâmetro) pra taxas oficiais do Banco Central (Selic, CDI, dólar comercial) num JSON só. Todas exigem pagamento x402 em USDC na rede Base (eip155:8453).'
+  contact:
+    email: agentumcomercial@carmozinog.com
+servers:
+- url: https://agentum.lat
+tags:
+- name: Business Intelligence
+paths:
+  /business-intelligence:
+    post:
+      operationId: businessIntelligence
+      summary: Inteligência empresarial por CNPJ
+      description: Consolida cadastro, atividades, endereço e sinais objetivos de uma empresa brasileira numa resposta estruturada pronta para sistemas e agentes.
+      tags:
+      - Business Intelligence
+      x-payment-info:
+        price:
+          mode: fixed
+          currency: USD
+          amount: '0.050000'
+        protocols:
+        - x402: {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cnpj:
+                  type: string
+                  description: CNPJ brasileiro, 14 dígitos, apenas números
+              required:
+              - cnpj
+            example:
+              cnpj: '68964713000109'
+      responses:
+        '200':
+          description: Cadastro, atividades, endereço e sinais objetivos consolidados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  company:
+                    type: object
+                  registration:
+                    type: object
+                  address:
+                    type: object
+                  activities:
+                    type: array
+                    items:
+                      type: string
+                  signals:
+                    type: array
+                    items:
+                      type: string
+                  summary:
+                    type: string
+                  sources:
+                    type: array
+                    items:
+                      type: string
+                  confidence:
+                    type: number
+                  queriedAt:
+                    type: string
+              example:
+                company:
+                  cnpj: 68.964.713/0001-09
+                  razaoSocial: AGENTUM LTDA
+                  nomeFantasia: AGENTUM
+                  naturezaJuridica: 206-2 - Sociedade Empresária Limitada
+                  porte: MICRO EMPRESA
+                  capitalSocial: 10000
+                registration:
+                  situacao: ATIVA
+                  dataSituacao: 03/09/2026
+                  dataAbertura: 03/09/2026
+                  optanteSimples: null
+                  optanteMei: null
+                address:
+                  logradouro: R TEREZINHA DUQUE BORBOREMA
+                  numero: '289'
+                  complemento: null
+                  bairro: CONJUNTO HABITACIONAL AUREA MENDES GIMENES
+                  cep: 14.178-210
+                  municipio: SERTAOZINHO
+                  uf: SP
+                activities:
+                - Desenvolvimento e licenciamento de programas de computador customizáveis
+                - Consultoria em tecnologia da informação
+                signals:
+                - Empresa aberta há menos de 1 ano
+                summary: AGENTUM LTDA (CNPJ 68.964.713/0001-09), situação cadastral ATIVA, atividade principal em desenvolvimento de software, localizada em Sertãozinho/SP.
+                sources:
+                - receitaws
+                confidence: 0.75
+                queriedAt: '2026-09-05T18:24:24.136Z'
+        '402':
+          description: Payment Required

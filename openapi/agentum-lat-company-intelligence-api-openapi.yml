@@ -1,0 +1,213 @@
+openapi: 3.2.0
+info:
+  title: AGENTUM Business Company Intelligence API
+  version: 0.1.0
+  description: 'Agente comercial da AGENTUM: inteligência empresarial e verificação de contraparte, pagas por chamada via x402 (USDC, Base mainnet). Rotas HTTP diretas — o serviço também fala A2A (POST /) para agentes que preferem esse protocolo, ver /.well-known/agent-card.json.'
+  x-guidance: Use GET /preflight?q=<CNPJ|LEI|nome> pra verificação de contraparte de uma empresa (brasileira ou não) antes de fechar negócio — devolve um veredito consolidado (band/confidence/flags), nunca um score inventado. Use GET /company-intelligence?cnpj=<14 dígitos> pra inteligência de CNPJ brasileiro cruzada com bases de integridade pública (TCU, CEIS, CNEP, CVM). Use GET /company?cnpj=<14 dígitos> pra cadastro básico (razão social, situação, endereço) sem a checagem de integridade. Todas exigem pagamento x402 em USDC na rede Base (eip155:8453), carteira 0x7D1EDdfBd167787251fed83b250ABBeA1cf59a6F.
+  contact:
+    email: agentumcomercial@carmozinog.com
+servers:
+- url: https://business.agentum.lat
+tags:
+- name: Company Intelligence
+paths:
+  /company-intelligence:
+    get:
+      operationId: companyIntelligence
+      summary: Inteligência de CNPJ brasileiro com checagem de integridade pública
+      description: Cadastro, situação e endereço de uma empresa brasileira, cruzados com bases oficiais de integridade (TCU Inidôneos, CEIS, CNEP) e dataset da CVM quando aplicável. Cada achado vem com fonte, status e horário da consulta — nenhum score agregado é inventado.
+      tags:
+      - Company Intelligence
+      x-payment-info:
+        price:
+          mode: fixed
+          currency: USD
+          amount: '0.020000'
+        protocols:
+        - x402: {}
+      parameters:
+      - name: cnpj
+        in: query
+        required: true
+        schema:
+          type: string
+          description: CNPJ brasileiro, 14 dígitos, com ou sem máscara
+        example: '68964713000109'
+      responses:
+        '200':
+          description: Cadastro consolidado + achados de integridade pública
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cnpj:
+                    type: string
+                  company:
+                    type: object
+                  findings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        source:
+                          type: string
+                        sourceType:
+                          type: string
+                          enum:
+                          - official_api
+                          - official_dataset
+                        status:
+                          type: string
+                        fact:
+                          type: string
+                        observedAt:
+                          type: string
+                  coverage:
+                    type: object
+                  derivedFindings:
+                    type: array
+                    items:
+                      type: object
+                  performance:
+                    type: object
+                  generatedAt:
+                    type: string
+              example:
+                cnpj: '68964713000109'
+                company:
+                  razaoSocial: AGENTUM LTDA
+                  situacaoCadastral: ATIVA
+                findings:
+                - source: TCU - Inidôneos e Suspensos
+                  sourceType: official_api
+                  status: not_found_in_checked_sources
+                  fact: Nenhum registro encontrado
+                  observedAt: '2026-09-11T12:00:00.000Z'
+                coverage:
+                  sourcesApplicable:
+                  - TCU
+                  - CEIS
+                  - CNEP
+                  sourcesCheckedSuccessfully:
+                  - TCU
+                  - CEIS
+                  - CNEP
+                  sourcesUnavailable: []
+                derivedFindings: []
+                performance:
+                  totalMs: 850
+                generatedAt: '2026-09-11T12:00:00.000Z'
+        '400':
+          description: CNPJ inválido
+        '502':
+          description: Fontes indisponíveis no momento da consulta
+        '402':
+          description: Payment Required
+  /company:
+    get:
+      operationId: company
+      summary: Cadastro básico de CNPJ brasileiro
+      description: Razão social, situação cadastral, natureza jurídica, CNAE principal, endereço e indicação de Simples Nacional — agregado de fontes públicas (brasilapi.com.br, fallback receitaws.com.br). Sem checagem de integridade pública (ver /company-intelligence ou /preflight para isso).
+      tags:
+      - Company Intelligence
+      x-payment-info:
+        price:
+          mode: fixed
+          currency: USD
+          amount: '0.020000'
+        protocols:
+        - x402: {}
+      parameters:
+      - name: cnpj
+        in: query
+        required: true
+        schema:
+          type: string
+          description: CNPJ brasileiro, 14 dígitos, com ou sem máscara
+        example: '68964713000109'
+      responses:
+        '200':
+          description: Cadastro básico da empresa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  razaoSocial:
+                    type: string
+                  nomeFantasia:
+                    type:
+                    - string
+                    - 'null'
+                  situacaoCadastral:
+                    type: string
+                  naturezaJuridica:
+                    type: string
+                  dataAbertura:
+                    type: string
+                  cnaePrincipal:
+                    type: string
+                  capitalSocial:
+                    type:
+                    - number
+                    - 'null'
+                  porte:
+                    type: string
+                  simplesNacional:
+                    type:
+                    - boolean
+                    - 'null'
+                  endereco:
+                    type: object
+                    properties:
+                      logradouro:
+                        type:
+                        - string
+                        - 'null'
+                      numero:
+                        type:
+                        - string
+                        - 'null'
+                      bairro:
+                        type:
+                        - string
+                        - 'null'
+                      municipio:
+                        type:
+                        - string
+                        - 'null'
+                      uf:
+                        type:
+                        - string
+                        - 'null'
+                      cep:
+                        type:
+                        - string
+                        - 'null'
+                  fonte:
+                    type: string
+              example:
+                razaoSocial: AGENTUM LTDA
+                nomeFantasia: AGENTUM
+                situacaoCadastral: ATIVA
+                naturezaJuridica: 206-2 - Sociedade Empresária Limitada
+                dataAbertura: 03/09/2026
+                cnaePrincipal: Desenvolvimento e licenciamento de programas de computador customizáveis
+                capitalSocial: 10000
+                porte: MICRO EMPRESA
+                simplesNacional: null
+                endereco:
+                  logradouro: R TEREZINHA DUQUE BORBOREMA
+                  numero: '289'
+                  bairro: CONJUNTO HABITACIONAL AUREA MENDES GIMENES
+                  municipio: SERTAOZINHO
+                  uf: SP
+                  cep: 14.178-210
+                fonte: brasilapi
+        '400':
+          description: CNPJ inválido
+        '502':
+          description: Fontes indisponíveis no momento da consulta
+        '402':
+          description: Payment Required

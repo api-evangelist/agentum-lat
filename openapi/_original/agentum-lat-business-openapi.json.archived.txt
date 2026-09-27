@@ -1,0 +1,2 @@
+# x-archived-from: agentum-lat-business-openapi.json
+# x-archived-on: 2026-09-26

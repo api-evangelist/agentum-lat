@@ -39,83 +39,18 @@ tags:
 - A2A
 - Agents
 apis:
-- aid: agentum-lat:apis-brasil
-  name: AGENTUM APIs Brasil
-  description: >-
-    The agentum.lat host: nine pay-per-call routes — GET /verificar-cnpj (CNPJ registration status, Simples
-    Nacional, address; $0.02), GET /taxas-brasil (Selic, CDI, commercial dollar from Banco Central SGS; $0.01),
-    GET /verificar-cep (address from a CEP; $0.01), GET /validar-cpf (CPF check digit only, no personal-data
-    lookup; $0.01), POST /business-intelligence (consolidated CNPJ report with partners and an AI summary;
-    $0.05), GET /fx-rates (ECB rates via Frankfurter; $0.01), GET /economic-data (World Bank indicators; $0.01),
-    GET /vat-validate (EU VIES; $0.01) and GET /company-enrich (GLEIF LEI lookup; $0.01). Every route answers
-    HTTP 402 with an x402 v2 PaymentRequirements challenge (exact scheme, USDC on eip155:8453, Bazaar discovery
-    extension) until paid. The published OpenAPI 3.1.0 at /openapi.json is PARTIAL by the provider's own
-    statement in llms.txt ("Schema parcial (algumas rotas)"): it describes four of the nine routes
-    (businessIntelligence, verificarCnpj, verificarCep, taxasBrasil); the other five are documented on the
-    homepage, in llms.txt and in the MCP server source, and each returned a live 402 challenge when probed.
-  humanURL: https://agentum.lat/
-  baseURL: https://agentum.lat
-  tags:
-  - Brazil
-  - KYB
-  - Company Data
-  - Exchange Rates
-  - Address Verification
-  - x402
-  properties:
-  - type: OpenAPI
-    url: openapi/agentum-lat-apis-brasil-openapi.json
-  - type: OpenAPI
-    name: AGENTUM — APIs Brasil OpenAPI (provider-hosted)
-    url: https://agentum.lat/openapi.json
-  - type: Documentation
-    url: https://agentum.lat/
-  - type: APIReference
-    url: https://agentum.lat/openapi.json
-  - type: Overlay
-    url: overlays/agentum-lat-apis-brasil-overlay.yaml
-- aid: agentum-lat:business
-  name: AGENTUM Business API
-  description: >-
-    The business.agentum.lat host ("AGENTUM Business", a separately deployed service with its own payout
-    wallet): GET /preflight?q= (counterparty verdict for a CNPJ, a 20-character LEI or a company name —
-    band clear/flagged/insufficient_data, confidence, flags and per-source components; $0.15),
-    GET /company-intelligence?cnpj= (CNPJ registration crossed with public-integrity sources TCU, CEIS/CNEP,
-    CNJ and CVM, facts only, no score; $0.02) and GET /company?cnpj= (basic registration without the integrity
-    check; $0.02). The OpenAPI 3.1.0 at /openapi.json covers all three operations (preflight,
-    companyIntelligence, company) with 200/400/402 and 404 or 502 responses; the host root returns a JSON
-    service index linking the agent card, /health and the OpenAPI, and every paid route answers an x402 v2
-    challenge until paid.
-  humanURL: https://agentum.lat/
-  baseURL: https://business.agentum.lat
-  tags:
-  - KYB
-  - Compliance
-  - Counterparty Verification
-  - Brazil
-  - x402
-  properties:
-  - type: OpenAPI
-    url: openapi/agentum-lat-business-openapi.json
-  - type: OpenAPI
-    name: AGENTUM Business OpenAPI (provider-hosted)
-    url: https://business.agentum.lat/openapi.json
-  - type: APIReference
-    url: https://business.agentum.lat/openapi.json
-  - type: Overlay
-    url: overlays/agentum-lat-business-overlay.yaml
 - aid: agentum-lat:business-a2a-agent
   name: AGENTUM Business A2A Agent
   description: >-
-    Agent2Agent (A2A) protocol surface of AGENTUM Business: an agent card at
-    https://business.agentum.lat/.well-known/agent-card.json (A2A 1.0 shape — supportedInterfaces with
-    protocolBinding JSONRPC and protocolVersion "1.0", version 0.1.0, provider AGENTUM) advertising two skills:
-    company_intelligence (structured CNPJ intelligence from brasilapi.com.br with a receitaws.com.br fallback)
-    and repo_intelligence (question answering over a public GitHub repository through the external DeepWiki
-    MCP server, stated as free "in this lab round"). The JSON-RPC endpoint is the host root,
-    https://business.agentum.lat/; it enforces the protocol version (an unversioned request is refused with
-    JSON-RPC error -32009 "Supported versions: 1.0"). Streaming is declared supported, push notifications and
-    an extended card are not, and securitySchemes is empty.
+    Agent2Agent (A2A) protocol surface of AGENTUM Business: an agent card at https://business.agentum.lat/.well-known/agent-card.json
+    (A2A 1.0 shape — supportedInterfaces with protocolBinding JSONRPC and protocolVersion "1.0", version
+    0.1.0, provider AGENTUM) advertising two skills: company_intelligence (structured CNPJ intelligence
+    from brasilapi.com.br with a receitaws.com.br fallback) and repo_intelligence (question answering
+    over a public GitHub repository through the external DeepWiki MCP server, stated as free "in this
+    lab round"). The JSON-RPC endpoint is the host root, https://business.agentum.lat/; it enforces the
+    protocol version (an unversioned request is refused with JSON-RPC error -32009 "Supported versions:
+    1.0"). Streaming is declared supported, push notifications and an extended card are not, and securitySchemes
+    is empty.
   humanURL: https://business.agentum.lat/.well-known/agent-card.json
   baseURL: https://business.agentum.lat/
   tags:
@@ -129,12 +64,97 @@ apis:
   - type: AgentCard
     name: A2A Agent Card (provider-hosted)
     url: https://business.agentum.lat/.well-known/agent-card.json
+- aid: agentum-lat:agentum-lat-business-intelligence-api
+  name: AGENTUM Business Intelligence API
+  description: The Business Intelligence API from AGENTUM — 1 operation(s) for business intelligence.
+  humanURL: https://agentum.lat/
+  baseURL: https://business.agentum.lat
+  tags:
+  - Business Intelligence
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-business-intelligence-api-openapi.yml
+  - type: Documentation
+    url: https://agentum.lat/
+  - type: APIReference
+    url: https://agentum.lat/openapi.json
+  - type: APIReference
+    url: https://business.agentum.lat/openapi.json
+- aid: agentum-lat:agentum-lat-company-intelligence-api
+  name: AGENTUM Company Intelligence API
+  description: The Company Intelligence API from AGENTUM — 2 operation(s) for company intelligence.
+  humanURL: https://agentum.lat/
+  baseURL: https://business.agentum.lat
+  tags:
+  - Company Intelligence
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-company-intelligence-api-openapi.yml
+  - type: Documentation
+    url: https://agentum.lat/
+  - type: APIReference
+    url: https://agentum.lat/openapi.json
+  - type: APIReference
+    url: https://business.agentum.lat/openapi.json
+- aid: agentum-lat:agentum-lat-counterparty-verification-api
+  name: AGENTUM Counterparty Verification API
+  description: >-
+    The Counterparty Verification API from AGENTUM — 1 operation(s) for counterparty verification.
+  humanURL: https://agentum.lat/
+  baseURL: https://business.agentum.lat
+  tags:
+  - Counterparty Verification
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-counterparty-verification-api-openapi.yml
+  - type: Documentation
+    url: https://agentum.lat/
+  - type: APIReference
+    url: https://agentum.lat/openapi.json
+  - type: APIReference
+    url: https://business.agentum.lat/openapi.json
+- aid: agentum-lat:agentum-lat-finance-api
+  name: AGENTUM Finance API
+  description: The Finance API from AGENTUM — 1 operation(s) for finance.
+  humanURL: https://agentum.lat/
+  baseURL: https://business.agentum.lat
+  tags:
+  - Finance
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-finance-api-openapi.yml
+  - type: Documentation
+    url: https://agentum.lat/
+  - type: APIReference
+    url: https://agentum.lat/openapi.json
+  - type: APIReference
+    url: https://business.agentum.lat/openapi.json
+- aid: agentum-lat:agentum-lat-verification-api
+  name: AGENTUM Verification API
+  description: The Verification API from AGENTUM — 2 operation(s) for verification.
+  humanURL: https://agentum.lat/
+  baseURL: https://business.agentum.lat
+  tags:
+  - Verification
+  properties:
+  - type: OpenAPI
+    url: openapi/agentum-lat-verification-api-openapi.yml
+  - type: Documentation
+    url: https://agentum.lat/
+  - type: APIReference
+    url: https://agentum.lat/openapi.json
+  - type: APIReference
+    url: https://business.agentum.lat/openapi.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/agentum-lat-apis-brasil-overlay.yaml
+- type: Overlay
+  url: overlays/agentum-lat-business-overlay.yaml
 - type: AgenticAccess
   url: agentic-access/agentum-lat-agentic-access.yml
 - type: VulnerabilityDisclosure
@@ -196,3 +216,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 30
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://business.agentum.lat/.well-known/agent-card.json"
+  grade: "flavored"
+  protocol_version: "1.0"
+  control: 404
