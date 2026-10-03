@@ -1,8 +1,8 @@
 {
   "provider": "agentum-lat",
   "sources": [
-    "agentum-lat-apis-brasil-openapi.json",
-    "agentum-lat-business-openapi.json"
+    "_original/agentum-lat-apis-brasil-openapi.json",
+    "_original/agentum-lat-business-openapi.json"
   ],
   "outputs": [
     "agentum-lat-business-intelligence-api-openapi.yml",
@@ -11,13 +11,11 @@
     "agentum-lat-company-intelligence-api-openapi.yml",
     "agentum-lat-counterparty-verification-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/agentum-lat-apis-brasil-openapi.json",
-    "archived openapi/agentum-lat-business-openapi.json"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "agentum-lat-apis-brasil-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "agentum-lat-apis-brasil-openapi.json: declared missing tag: Business Intelligence",
     "agentum-lat-apis-brasil-openapi.json: declared missing tag: Finance",
@@ -25,7 +23,13 @@
     "agentum-lat-business-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "agentum-lat-business-openapi.json: declared missing tag: Company Intelligence",
     "agentum-lat-business-openapi.json: declared missing tag: Counterparty Verification",
-    "apis.yml register: written (+5 apis, 6 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "agentum-lat-business-intelligence-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "agentum-lat-company-intelligence-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "agentum-lat-counterparty-verification-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "agentum-lat-finance-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "agentum-lat-verification-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
