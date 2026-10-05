@@ -1,0 +1,12 @@
+{
+ "url": "https://business.agentum.lat/openapi.json",
+ "requested_url": "https://business.agentum.lat/openapi.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 13003,
+ "sha256": "deea43818f66cf1e4bd8147e9a4a108a7ecb86f3adef499c3ccad88c34ef1952",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
