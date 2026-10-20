@@ -1,4 +1,34 @@
 edges:
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@agentum/x402-spend-guard
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@agentum/x402-spend-guard'
+      version: 1.1.1
+      released: '2026-09-18'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@agentum/x402-spend-guard
+      repo_leg: github-org:orionlabsai
+      publisher_leg: org:agentum
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
 - partner_name: A2A protocol (own Agent Card)
   partner: null
   partner_match: register
@@ -10,13 +40,14 @@ edges:
   relationship: compatible
   shape: a2a
   evidence_kind: own-wellknown
-  degree: conformant
+  degree: flavored
   report_only: true
   a2a_card:
-    grade: conformant
+    grade: flavored
     verdict: live
     protocol_version: '1.0'
-    deviations: []
+    deviations:
+    - no-protocolVersion
     card_subject: unknown
   contract_reference:
     register: provider's own /.well-known/agent-card.json
@@ -28,7 +59,7 @@ edges:
     matched_domain: agentum.lat
     matched_by: own-domain
     detected_by: sweep-ai-agents.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   detected_by: sweep-ai-agents.py
   first_seen: '2026-10-15'
 - partner_name: a2aregistry.org
@@ -64,39 +95,9 @@ edges:
     sample_agents:
     - AGENTUM Business
     detected_by: sweep-ai-agents.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   detected_by: sweep-ai-agents.py
   first_seen: '2026-10-15'
-- partner_name: npm registry
-  partner: npm
-  partner_match: register
-  type: register
-  direction: provider-built
-  category: official SDK (JavaScript/TypeScript)
-  evidence: https://www.npmjs.com/package/@agentum/x402-spend-guard
-  channel: package-registry
-  relationship: distribution-channel
-  contract_reference:
-    register: npm registry (public registry JSON)
-    spec_file: null
-    language: JavaScript/TypeScript
-    packages:
-    - name: '@agentum/x402-spend-guard'
-      version: 1.1.1
-      released: '2026-09-18'
-      released_field: modified
-      lapsed: false
-      page: https://www.npmjs.com/package/@agentum/x402-spend-guard
-      repo_leg: github-org:orionlabsai
-      publisher_leg: org:agentum
-      matched_by: github-org
-    current: true
-    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
-      24 months'
-    detected_by: sweep-official-sdks.py
-    detected: '2026-10-18'
-  detected_by: sweep-official-sdks.py
-  first_seen: '2026-10-18'
 generated: '2026-10-15'
 method: searched
 source:
