@@ -64,13 +64,124 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-AGENTUM (AGENTUM LTDA, Sertãozinho, São Paulo, Brazil) is a "payment agent" data provider: eleven HTTP endpoints sold per call over the x402 protocol (USDC on Base mainnet) with no account, no API key and no subscription. Nine routes on agentum.lat cover Brazilian and global company and market data (CNPJ, CEP, CPF, Banco Central rates, ECB FX, World Bank indicators, EU VIES VAT, GLEIF LEI, an AI-summarised CNPJ report) and three on business.agentum.lat (AGENTUM Business) add counterparty compliance checks (TCU, CEIS/CNEP, CNJ, CVM) and a preflight verdict. The same routes ship as eleven tools in the `@agentum/mcp-server` npm package (stdio), and AGENTUM Business is an A2A 1.0 JSON-RPC agent with a card at `business.agentum.lat/.well-known/agent-card.json`.
+AGENTUM (AGENTUM LTDA, a software company in Sertãozinho, São Paulo, Brazil, registered September 2026) is a "payment agent" data provider: eleven HTTP endpoints sold per call over the x402 protocol — USDC on Base mainnet (eip155:8453) — with no account, no API key and no subscription; an agent pays inside the request and receives the result in the same round trip. Nine routes on agentum.lat cover Brazilian and global company and market data (CNPJ registration status, CEP address lookup, CPF check-digit validation, Banco Central Selic/CDI/commercial-dollar rates, ECB FX rates, World Bank indicators, EU VIES VAT validation, GLEIF LEI lookup and an AI-summarised business-intelligence report on a CNPJ), and three on business.agentum.lat (AGENTUM Business) add counterparty compliance checks against TCU, CEIS/CNEP, CNJ and CVM plus a consolidated preflight verdict. The same routes ship as eleven tools in the @agentum/mcp-server npm package (stdio, the caller's own wallet pays), and AGENTUM Business is also an A2A 1.0 JSON-RPC agent with a card at business.agentum.lat/.well-known/agent-card.json. Partial OpenAPI 3.1 contracts, an llms.txt and an RFC 9116 security.txt are published; every paid route answers a genuine x402 v2 challenge with Bazaar discovery metadata and IETF RateLimit headers.
 
-- Website and route list: https://agentum.lat/
-- llms.txt: https://agentum.lat/llms.txt
-- OpenAPI (partial, 4 of 9 routes): https://agentum.lat/openapi.json
-- OpenAPI (AGENTUM Business): https://business.agentum.lat/openapi.json
-- A2A agent card: https://business.agentum.lat/.well-known/agent-card.json
-- MCP server: https://github.com/orionlabsai/agentum-mcp-server
+**Areas:** Company · Business Intelligence · KYB · Company Data · Compliance · Brazil · x402 · Agentic Commerce · Exchange Rates · Address Verification · Economic Data · MCP
 
-Profiled by the API Evangelist enrichment pipeline on 2026-09-19 from the public surfaces above; every artifact in this repository records how it was obtained (`method: searched | probed | derived | generated`). Surfaced originally via a2aregistry.org.
+## AGENTUM on APIs.io
+
+Everything profiled for AGENTUM is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/agentum-lat/](https://apis.io/providers/agentum-lat/)** — or go straight to one of the APIs or properties below.
+
+### APIs (6)
+
+- [AGENTUM Business A2A Agent](https://apis.io/apis/agentum-lat/business-a2a-agent/) — Agent2Agent (A2A) protocol surface of AGENTUM Business: an agent card at https://business.agentum.lat/.well-known/agent-card.json (A2A 1.0 shape —…
+- [AGENTUM Business Intelligence API](https://apis.io/apis/agentum-lat/agentum-lat-business-intelligence-api/) — The Business Intelligence API from AGENTUM — 1 operation(s) for business intelligence.
+- [AGENTUM Company Intelligence API](https://apis.io/apis/agentum-lat/agentum-lat-company-intelligence-api/) — The Company Intelligence API from AGENTUM — 2 operation(s) for company intelligence.
+- [AGENTUM Counterparty Verification API](https://apis.io/apis/agentum-lat/agentum-lat-counterparty-verification-api/) — The Counterparty Verification API from AGENTUM — 1 operation(s) for counterparty verification.
+- [AGENTUM Finance API](https://apis.io/apis/agentum-lat/agentum-lat-finance-api/) — The Finance API from AGENTUM — 1 operation(s) for finance.
+- [AGENTUM Verification API](https://apis.io/apis/agentum-lat/agentum-lat-verification-api/) — The Verification API from AGENTUM — 2 operation(s) for verification.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [agentum-mcp](https://apis.io/servers/agentum-lat/agentum-mcp/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Agentum Lat Agentic Access](https://apis.io/agentic-access/agentum-lat/agentum-lat-agentic-access/)
+
+#### Overlays (2)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Agentum Lat Apis Brasil Overlay](https://apis.io/overlays/agentum-lat/agentum-lat-apis-brasil-overlay/)
+- [Agentum Lat Business Overlay](https://apis.io/overlays/agentum-lat/agentum-lat-business-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Agentum Lat Authentication](https://apis.io/security/agentum-lat/agentum-lat-authentication/)
+- [Agentum Lat Domain Security](https://apis.io/security/agentum-lat/agentum-lat-domain-security/)
+- [Agentum Lat Vulnerability Disclosure](https://apis.io/security/agentum-lat/agentum-lat-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Agentum Lat Plans Pricing](https://apis.io/plans/agentum-lat/agentum-lat-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Agentum Lat Rate Limits](https://apis.io/rate-limits/agentum-lat/agentum-lat-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://agentum.lat/)
+- [Documentation](https://agentum.lat/)
+- [Pricing](https://agentum.lat/)
+- [GitHub](https://github.com/orionlabsai)
+
+## API Evangelist rating
+
+**Kin Score 40.9** — developing · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 76.7 |
+| Contract quality | 48.1 |
+| Contract governance | 18.2 |
+| Operational transparency | 36.8 |
+| Developer ergonomics | 37.5 |
+| Access clarity | 31.6 |
+
+**Agent readiness 35.6** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | conformant |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 22.5** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/agentum-lat/](https://apis.io/providers/agentum-lat/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for AGENTUM: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/agentum-lat/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
