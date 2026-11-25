@@ -95,34 +95,46 @@ Model Context Protocol servers that expose the API to agents.
 
 Which operations an agent can call, which act, and which need a human in the loop.
 
-- [Agentum Lat Agentic Access](https://apis.io/agentic-access/agentum-lat/agentum-lat-agentic-access/)
+- [AGENTUM Agentic Access](https://apis.io/agentic-access/agentum-lat/agentum-lat-agentic-access/)
 
 #### Overlays (2)
 
 OpenAPI overlays, including conversational phrasing for each operation.
 
-- [Agentum Lat Apis Brasil Overlay](https://apis.io/overlays/agentum-lat/agentum-lat-apis-brasil-overlay/)
-- [Agentum Lat Business Overlay](https://apis.io/overlays/agentum-lat/agentum-lat-business-overlay/)
+- [AGENTUM Apis Brasil Overlay](https://apis.io/overlays/agentum-lat/agentum-lat-apis-brasil-overlay/)
+- [AGENTUM Business Overlay](https://apis.io/overlays/agentum-lat/agentum-lat-business-overlay/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [AGENTUM API Rules](https://apis.io/rules/agentum-lat/agentum-lat-rules/)
 
 #### Security (3)
 
 Authentication, trust centre, and vulnerability disclosure.
 
-- [Agentum Lat Authentication](https://apis.io/security/agentum-lat/agentum-lat-authentication/)
-- [Agentum Lat Domain Security](https://apis.io/security/agentum-lat/agentum-lat-domain-security/)
-- [Agentum Lat Vulnerability Disclosure](https://apis.io/security/agentum-lat/agentum-lat-vulnerability-disclosure/)
+- [AGENTUM Authentication](https://apis.io/security/agentum-lat/agentum-lat-authentication/)
+- [AGENTUM Domain Security](https://apis.io/security/agentum-lat/agentum-lat-domain-security/)
+- [AGENTUM Vulnerability Disclosure](https://apis.io/security/agentum-lat/agentum-lat-vulnerability-disclosure/)
 
 #### Plans and pricing (1)
 
 Published plans, tiers and prices.
 
-- [Agentum Lat Plans Pricing](https://apis.io/plans/agentum-lat/agentum-lat-plans-pricing/)
+- [AGENTUM Plans Pricing](https://apis.io/plans/agentum-lat/agentum-lat-plans-pricing/)
 
 #### Rate limits (1)
 
 Published request limits.
 
-- [Agentum Lat Rate Limits](https://apis.io/rate-limits/agentum-lat/agentum-lat-rate-limits/)
+- [AGENTUM Rate Limits](https://apis.io/rate-limits/agentum-lat/agentum-lat-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [AGENTUM Finops](https://apis.io/finops/agentum-lat/agentum-lat-finops/)
 
 ## Where to find this API
 
@@ -135,18 +147,18 @@ Links to the company's own pages. This repository publishes no copy of their spe
 
 ## API Evangelist rating
 
-**Kin Score 40.4** — developing · rubric 0.25.0 · scored 2026-10-23
+**Kin Score 44.9** — developing · rubric 0.28.1 · scored 2026-11-21
 
 | Facet | Score |
 |---|---|
-| Discoverability | 71.7 |
-| Contract quality | 48.1 |
-| Contract governance | 18.2 |
-| Operational transparency | 36.8 |
+| Discoverability | 81.7 |
+| Contract quality | 50.3 |
+| Contract governance | 31.8 |
+| Operational transparency | 33.3 |
 | Developer ergonomics | 37.5 |
-| Access clarity | 31.6 |
+| Access clarity | 40.4 |
 
-**Agent readiness 37.0** — agent-ready
+**Agent readiness 36.2** — agent-ready
 
 | Agent-readiness dimension | Result |
 |---|---|
@@ -171,6 +183,10 @@ Links to the company's own pages. This repository publishes no copy of their spe
 | Agentic Commerce | — |
 | Pagination Ratio | na |
 | Operation Distinctiveness | distinct |
+| MCP Tool Quality | na |
+| Onboarding Descriptor | — |
+| Dns Aid Index | na |
+| Markdown Negotiation | na |
 
 **Regulatory alignment 22.5** — Horizontal (data, software, accessibility, platform)
 
